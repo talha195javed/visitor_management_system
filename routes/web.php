@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\AdminController;
 
 // Landing Page
 // Rename the visitor home route
@@ -16,6 +17,10 @@ Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware(
 // Visitor Check-in & Check-out (Public)
 Route::get('/check-in', [VisitorController::class, 'showCheckIn'])->name('visitor.checkin');
 Route::post('/check-in', [VisitorController::class, 'storeCheckIn'])->name('visitor.storeCheckIn');
+Route::post('/update-visitor', [VisitorController::class, 'update_visitor'])->name('update.visitor');
+
+Route::post('/pre-registor-visitor', [VisitorController::class, 'pre_registor_visitor'])->name('pre-registor.visitor');
+
 
 Route::get('/check-out', [VisitorController::class, 'showCheckOut'])->name('visitor.checkout');
 Route::post('/check-out', [VisitorController::class, 'storeCheckOut'])->name('visitor.storeCheckOut');
@@ -60,6 +65,17 @@ Route::post('/visitor/agreement/{id}', [VisitorController::class, 'storeAgreemen
 Route::get('/visitor/success/{id}', [VisitorController::class, 'visitor_success'])
     ->name('visitor.success');
 
+Route::get('employers_list', [EmployeeController::class, 'employers_list'])->name('employers_list');
+
+Route::get('employers_archive_list', [EmployeeController::class, 'employers_archive_list'])->name('employers_archive_list');
+
+Route::get('visitors_archive_list', [VisitorController::class, 'visitors_archive_list'])->name('visitors_archive_list');
+
+Route::post('/employees/{id}/employers_restore', [EmployeeController::class, 'employers_restore'])->name('employers_restore');
+
+Route::post('/visitors/{id}/visitors_restore', [VisitorController::class, 'visitors_restore'])->name('visitors_restore');
+
+
 Route::prefix('visitors')->name('visitors.')->group(function () {
     Route::get('admin_list', [VisitorController::class, 'admin_list'])->name('admin_list');
     Route::get('admin_pre-register', [VisitorController::class, 'admin_preRegister'])->name('admin_pre_register');
@@ -71,3 +87,27 @@ Route::prefix('visitors')->name('visitors.')->group(function () {
 });
 
 Route::get('/visitors/{id}', [VisitorController::class, 'show'])->name('visitors.show');
+
+Route::get('/employee/{id}', [EmployeeController::class, 'employee_show'])->name('employee_show');
+
+Route::post('/update-employee', [EmployeeController::class, 'update_employee'])->name('update_employee');
+
+Route::get('/create-employee', [EmployeeController::class, 'create_employee'])->name('create_employee');
+
+Route::post('/register-employee', [EmployeeController::class, 'register_employee'])->name('register_employee');
+
+Route::post('/employees/{id}/archive', [EmployeeController::class, 'archive'])->name('employees.archive');
+
+Route::post('/visitors/{id}/archive', [VisitorController::class, 'archive'])->name('visitors.archive');
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/create', [AdminController::class, 'showCreateForm'])->name('users.create');
+
+    Route::get('/users_list', [AdminController::class, 'users_list'])->name('users.list');
+
+    Route::get('/user_show/{id}', [AdminController::class, 'user_show'])->name('users.user_show');
+
+    Route::post('/user_store', [AdminController::class, 'store'])->name('users.store');
+});
+Route::post('/update-user', [AdminController::class, 'update_user'])->name('users.update_user');
+

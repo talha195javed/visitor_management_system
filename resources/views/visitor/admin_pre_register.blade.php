@@ -5,16 +5,18 @@
 <main id="main" class="main">
 
     <div class="pagetitle">
+        <br>
         <h1>Profile</h1>
+        <br>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/home">Home</a></li>
-                <li class="breadcrumb-item"><a href="/employers_list">Employee</a></li>
-                <li class="breadcrumb-item active">Register</li>
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item">Users</li>
+                <li class="breadcrumb-item active">Pre Register</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
-
+    <br>
     <section class="section profile">
         <div class="row">
 
@@ -25,25 +27,26 @@
                         <ul class="nav nav-tabs nav-tabs-bordered">
 
                             <li class="nav-item">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Register Employee</button>
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Pre Register User</button>
                             </li>
 
                         </ul>
                         <div class="tab-content pt-2">
                             <div class=" profile-edit pt-3" id="profile-edit">
-                                <form id="employeeForm">
+                                <!-- Profile Edit Form -->
+                                <form id="editVisitorForm">
                                     @csrf
 
                                     <!-- Step 1: Full Name -->
-                                    <label for="name" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
+                                    <label for="full_name" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
                                     <div id="nameField" class="form-group d-flex align-items-center msideb-3">
-                                        <input type="text" class="form-control" name="name" id="name" placeholder="Full Name">
+                                        <input type="text" class="form-control" name="full_name" id="full_name" placeholder="Full Name">
                                     </div>
 
                                     <!-- Step 2: Company -->
-                                    <label for="company" class="col-md-4 col-lg-3 col-form-label">Company</label>
+                                    <label for="company" class="col-md-4 col-lg-3 col-form-label">Company Visited</label>
                                     <div id="companyField" class="form-group d-flex align-items-center mb-3">
-                                        <input type="text" class="form-control" name="company" id="company" placeholder="Office in which you are working">
+                                        <input type="text" class="form-control" name="company" id="company" placeholder="Office you have to Visit">
                                     </div>
 
                                     <!-- Step 3: Email -->
@@ -53,19 +56,30 @@
                                     </div>
 
                                     <!-- Step 4: Phone -->
-                                    <label for="contact_number" class="col-md-4 col-lg-3 col-form-label">Contact Number</label>
+                                    <label for="phone" class="col-md-4 col-lg-3 col-form-label">Phone</label>
                                     <div id="phoneField" class="form-group d-flex align-items-center mb-3">
-                                        <input type="text" class="form-control" name="contact_number" id="contact_number" placeholder="Contact Number">
+                                        <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone">
+                                    </div>
+
+                                    <!-- Step 5: ID Type -->
+                                    <label for="id_type" class="col-md-4 col-lg-3 col-form-label">ID Type</label>
+                                    <div id="idField" class="form-group d-flex align-items-center mb-3">
+                                        <select name="id_type" id="id_type" class="form-control">
+                                            <option value="">Select ID Type</option>
+                                            <option value="emirates_id">Emirates ID</option>
+                                            <option value="passport">Passport</option>
+                                            <option value="cnic">National CNIC</option>
+                                        </select>
                                     </div>
 
                                     <!-- Step 6: ID Number -->
-                                    <label for="position" class="col-md-4 col-lg-3 col-form-label">Position</label>
+                                    <label for="identification_number" class="col-md-4 col-lg-3 col-form-label">ID Number</label>
                                     <div id="idNumberField" class="form-group d-flex align-items-center mb-3">
-                                        <input type="text" class="form-control" name="position" id="position" placeholder="Enter Your Company Position">
+                                        <input type="text" class="form-control" name="identification_number" id="identification_number" placeholder="Enter ID Number">
                                     </div>
 
                                     <div class="text-center">
-                                        <button type="submit" class="btn btn-primary">Register Employee</button>
+                                        <button type="submit" class="btn btn-primary">Register Visitor</button>
                                     </div>
                                 </form>
                             </div>
@@ -80,20 +94,20 @@
     </section>
     <script>
         $(document).ready(function() {
-            $('#employeeForm').on('submit', function(e) {
+            $('#editVisitorForm').on('submit', function(e) {
                 e.preventDefault();
 
                 var formData = $(this).serialize();
 
                 $.ajax({
-                    url: '/employers_list',
+                    url: '/pre-registor-visitor',
                     type: 'POST',
                     data: formData,
                     success: function(response) {
                         if (response.success) {
                             Swal.fire({
                                 title: 'Success!',
-                                text: 'Employee Created Successfully!',
+                                text: 'Visitor updated successfully!',
                                 icon: 'success',
                                 confirmButtonText: 'OK'
                             }).then(function() {
@@ -103,7 +117,7 @@
                             // Handle error (e.g., show an error message)
                             Swal.fire({
                                 title: 'Error!',
-                                text: 'There was an issue creating the employee.',
+                                text: 'There was an issue updating the visitor.',
                                 icon: 'error',
                                 confirmButtonText: 'Try Again'
                             });

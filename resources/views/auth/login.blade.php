@@ -1,132 +1,266 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Fonts Form Google Font ::- https://fonts.google.com/  -:: */
+        @import url("https://fonts.googleapis.com/css?family=Abel|Abril+Fatface|Alegreya|Arima+Madurai|Dancing+Script|Dosis|Merriweather|Oleo+Script|Overlock|PT+Serif|Pacifico|Playball|Playfair+Display|Share|Unica+One|Vibur");
+        /* End Fonts */
+        /* Start Global rules */
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
 
-@section('content')
+        /* End Global rules */
 
-<link rel="stylesheet" href="{{ asset('assets/css/admin_login.css') }}">
+        /* Start body rules */
+        body {
+            background-image: linear-gradient(-225deg, #e3fdf5 0%, #ffe6fa 100%);
+            background-image: linear-gradient(to top, #a8edea 0%, #fed6e3 100%);
+            background-attachment: fixed;
+            background-repeat: no-repeat;
 
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: sans-serif;
-        background: linear-gradient(#0b1c30, #0b1c30);
-        height: 100%;
-    }
+            font-family: "Vibur", cursive;
+            /*   the main font */
+            font-family: "Abel", sans-serif;
+            opacity: 0.95;
+            /* background-image: linear-gradient(to top, #d9afd9 0%, #97d9e1 100%); */
+        }
 
-    .login-box {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 400px;
-        padding: 40px;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, .5);
-        box-sizing: border-box;
-        box-shadow: 0 15px 25px rgba(0, 0, 0, .6);
-        border-radius: 10px;
-        color: #fff;
-    }
+        /* |||||||||||||||||||||||||||||||||||||||||||||*/
+        /* //////////////////////////////////////////// */
 
-    .login-box h2 {
-        margin: 0 0 30px;
-        padding: 0;
-        text-align: center;
-    }
+        /* End body rules */
 
-    .user-box {
-        position: relative;
-    }
+        /* Start form  attributes */
+        form {
+            width: 450px;
+            min-height: 500px;
+            height: auto;
+            border-radius: 5px;
+            margin: 2% auto;
+            box-shadow: 0 9px 50px hsla(20, 67%, 75%, 0.31);
+            padding: 2%;
+            background-image: linear-gradient(-225deg, #e3fdf5 50%, #ffe6fa 50%);
+        }
 
-    .user-box input {
-        width: 100%;
-        padding: 10px 0;
-        font-size: 16px;
-        color: #fff;
-        margin-bottom: 30px;
-        border: none;
-        border-bottom: 1px solid #fff;
-        outline: none;
-        background: transparent;
-    }
+        /* form Container */
+        form .con {
+            display: -webkit-flex;
+            display: flex;
 
-    .user-box label {
-        position: absolute;
-        top: 0;
-        left: 0;
-        padding: 10px 0;
-        font-size: 16px;
-        color: #fff;
-        pointer-events: none;
-        transition: .5s;
-    }
+            -webkit-justify-content: space-around;
+            justify-content: space-around;
 
-    .user-box input:focus ~ label,
-    .user-box input:valid ~ label {
-        top: -20px;
-        left: 0;
-        color: #03e9f4;
-        font-size: 12px;
-    }
+            -webkit-flex-wrap: wrap;
+            flex-wrap: wrap;
 
-    button {
-        background: transparent;
-        border: none;
-        color: #03e9f4;
-        font-size: 16px;
-        cursor: pointer;
-        text-transform: uppercase;
-        letter-spacing: 4px;
-        position: relative;
-        display: inline-block;
-    }
+            margin: 0 auto;
+        }
 
-    button:hover {
-        color: #fff;
-    }
+        /* the header form form */
+        header {
+            margin: 2% auto 10% auto;
+            text-align: center;
+        }
 
-    button:focus {
-        outline: none;
-    }
+        /* Login title form form */
+        header h2 {
+            font-size: 250%;
+            font-family: "Playfair Display", serif;
+            color: #3e403f;
+        }
 
-</style>
+        /*  A welcome message or an explanation of the login form */
+        header p {
+            letter-spacing: 0.05em;
+        }
 
-<div class="login-box">
-    <h2>Login</h2>
+        /* //////////////////////////////////////////// */
+        /* //////////////////////////////////////////// */
+
+        .input-item {
+            background: #fff;
+            color: #333;
+            padding: 14.5px 0px 15px 9px;
+            border-radius: 5px 0px 0px 5px;
+        }
+
+        /* Show/hide password Font Icon */
+        #eye {
+            background: #fff;
+            color: #333;
+
+            margin: 5.9px 0 0 0;
+            margin-left: -20px;
+            padding: 15px 9px 19px 0px;
+            border-radius: 0px 5px 5px 0px;
+
+            float: right;
+            position: relative;
+            right: 1%;
+            top: -0.2%;
+            z-index: 5;
+
+            cursor: pointer;
+        }
+
+        /* inputs form  */
+        input[class="form-input"] {
+            width: 240px;
+            height: 50px;
+
+            margin-top: 2%;
+            padding: 15px;
+
+            font-size: 16px;
+            font-family: "Abel", sans-serif;
+            color: #5e6472;
+
+            outline: none;
+            border: none;
+
+            border-radius: 0px 5px 5px 0px;
+            transition: 0.2s linear;
+        }
+
+        input[id="txt-input"] {
+            width: 250px;
+        }
+
+        /* focus  */
+        input:focus {
+            transform: translateX(-2px);
+            border-radius: 5px;
+        }
+
+        /* //////////////////////////////////////////// */
+        /* //////////////////////////////////////////// */
+
+        /* input[type="text"] {min-width: 250px;} */
+        /* buttons  */
+        button {
+            display: inline-block;
+            color: #252537;
+
+            width: 280px;
+            height: 50px;
+
+            padding: 0 20px;
+            background: #fff;
+            border-radius: 5px;
+
+            outline: none;
+            border: none;
+
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s linear;
+
+            margin: 7% auto;
+            letter-spacing: 0.05em;
+        }
+
+        /* Submits */
+        .submits {
+            width: 48%;
+            display: inline-block;
+            float: left;
+            margin-left: 2%;
+        }
+
+        /*       Forgot Password button FAF3DD  */
+        .frgt-pass {
+            background: transparent;
+        }
+
+        /*     Sign Up button  */
+        .sign-up {
+            background: #b8f2e6;
+        }
+
+        /* buttons hover */
+        button:hover {
+            transform: translatey(3px);
+            box-shadow: none;
+        }
+
+        /* buttons hover Animation */
+        button:hover {
+            animation: ani9 0.4s ease-in-out infinite alternate;
+        }
+
+        @keyframes ani9 {
+            0% {
+                transform: translateY(3px);
+            }
+            100% {
+                transform: translateY(5px);
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="overlay">
     <form method="POST" action="{{ route('login') }}">
         @csrf
+        <div class="con">
+            <header class="head-form">
+                <h2>Log In</h2>
+                <p>login here using your email and password</p>
+            </header>
+            <br>
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+                <div class="field-set">
+                    <span class="input-item">
+          <i class="fa fa-user-circle"></i>
+        </span>
+                    <input class="form-input" name="email" id="email" type="email" placeholder="@Email" required>
 
-        <div class="user-box">
-            <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-            <label>Email Address</label>
-            @error('email')
-            <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
-        </div>
+                    <br>
+                    <span class="input-item">
+          <i class="fa fa-key"></i>
+        </span>
+                    <input class="form-input" type="password" placeholder="Password" id="password" name="password"
+                           required>
 
-        <div class="user-box">
-            <input id="password" type="password" name="password" required autocomplete="current-password">
-            <label>Password</label>
-            @error('password')
-            <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-md-6 offset-md-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                    <label class="form-check-label" for="remember">
-                        {{ __('Remember Me') }}
-                    </label>
+                    <br>
+                    <button class="log-in" type="submit"> Log In</button>
                 </div>
-            </div>
+            </form>
         </div>
 
-        <button type="submit">Login</button>
     </form>
 </div>
-@endsection
+<script>
+    function show() {
+        var p = document.getElementById('pwd');
+        p.setAttribute('type', 'text');
+    }
+
+    function hide() {
+        var p = document.getElementById('pwd');
+        p.setAttribute('type', 'password');
+    }
+
+    var pwShown = 0;
+
+    document.getElementById("eye").addEventListener("click", function () {
+        if (pwShown == 0) {
+            pwShown = 1;
+            show();
+        } else {
+            pwShown = 0;
+            hide();
+        }
+    }, false);
+
+</script>
+</body>
+</html>

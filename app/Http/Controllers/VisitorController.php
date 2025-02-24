@@ -36,6 +36,61 @@ class VisitorController extends Controller
         return view('visitor.checkin', compact('preRegisteredVisitors'));
     }
 
+    public function pre_registor_visitor(Request $request)
+    {
+            $request->validate([
+                'full_name' => 'required',
+                'company' => 'required',
+                'email' => 'required|email',
+                'phone' => 'required',
+            ]);
+            $visitor = new Visitor();
+            $visitor->full_name = $request->full_name;
+            $visitor->company = $request->company;
+            $visitor->email = $request->email;
+            $visitor->phone = $request->phone;
+            $visitor->id_type = $request->id_type;
+            $visitor->identification_number = $request->identification_number;
+            $visitor->pre_register = 1;
+            $visitor->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function update_visitor(Request $request)
+    {
+        // Validate the input data
+        $validated = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'company' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'required|string|max:15',
+            'id_type' => 'required|string',
+            'identification_number' => 'required|string|max:255',
+        ]);
+
+        // Find the visitor by the visitor ID and update their information
+        $visitor = Visitor::find($request->visitor_id);
+
+        if ($visitor) {
+            // Update the visitor's details
+            $visitor->update([
+                'full_name' => $validated['full_name'],
+                'company' => $validated['company'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'],
+                'id_type' => $validated['id_type'],
+                'identification_number' => $validated['identification_number'],
+            ]);
+
+            // Return a success response
+            return response()->json(['success' => true]);
+        } else {
+            // Return an error if the visitor was not found
+            return response()->json(['success' => false, 'message' => 'Visitor not found']);
+        }
+    }
+
     public function storeCheckIn(Request $request)
     {
         try {
@@ -48,20 +103,19 @@ class VisitorController extends Controller
                 'identification_number' => 'required',
             ]);
 
-//            // Check if visitor already exists based on email
-//            $visitor = Visitor::where('email', $request->email)->first();
-//
-//            if ($visitor) {
-//                // Update the existing visitor's details
-//                $visitor->full_name = $request->full_name;
-//                $visitor->company = $request->company;
-//                $visitor->phone = $request->phone;
-//                $visitor->id_type = $request->id_type;
-//                $visitor->identification_number = $request->identification_number;
-//                $visitor->check_in_time = now();
-//                $visitor->save();
-//            } else {
-//                // Create a new visitor record
+            $visitor = Visitor::where('email', $request->email)
+                ->where('pre_register', 1)
+                ->first();
+            if ($visitor) {
+                $visitor->full_name = $request->full_name;
+                $visitor->company = $request->company;
+                $visitor->phone = $request->phone;
+                $visitor->id_type = $request->id_type;
+                $visitor->identification_number = $request->identification_number;
+                $visitor->check_in_time = now();
+                $visitor->pre_register = 0;
+                $visitor->save();
+            } else {
                 $visitor = new Visitor();
                 $visitor->full_name = $request->full_name;
                 $visitor->company = $request->company;
@@ -70,8 +124,9 @@ class VisitorController extends Controller
                 $visitor->id_type = $request->id_type;
                 $visitor->identification_number = $request->identification_number;
                 $visitor->check_in_time = now();
+                $visitor->pre_register = 0;
                 $visitor->save();
-//            }
+            }
 
             // Redirect to image capture page with the visitor ID
             return redirect()->route('visitor.selectRole', ['id' => $visitor->id]);
@@ -358,7 +413,7 @@ class VisitorController extends Controller
 
     public function admin_list()
     {
-        $visitors = Visitor::withTrashed()->get(); // Includes soft deleted visitors
+        $visitors = Visitor::whereNull('deleted_at')->get();
         return view('visitor.admin_list', compact('visitors'));
     }
 
@@ -369,13 +424,15 @@ class VisitorController extends Controller
 
     public function admin_checkedIn()
     {
-        $visitors = Visitor::where('status', 'checked_in')->get();
+        $visitors = Visitor::whereNull('check_out_time')
+            ->whereNotNull('check_in_time')
+            ->get();
         return view('visitor.admin_checked_in', compact('visitors'));
     }
 
     public function admin_checkedOut()
     {
-        $visitors = Visitor::where('status', 'checked_out')->get();
+        $visitors = Visitor::whereNotNull('check_out_time')->get();
         return view('visitor.admin_checked_out', compact('visitors'));
     }
 
@@ -394,5 +451,27 @@ class VisitorController extends Controller
         $photoPath = $visitor->photo ? asset("assets/visitor_photos/{$visitor->photo}") : asset('images/default-user.png');
 
         return view('visitor.admin_visitor_show', compact('visitor', 'idPhotoPath', 'photoPath'));
+    }
+
+    public function archive($id)
+    {
+        $visitor = Visitor::findOrFail($id);
+        $visitor->delete();
+
+        return redirect()->back()->with('success', 'Visitor archived successfully.');
+    }
+
+    public function visitors_archive_list()
+    {
+        $archivedVisitors = Visitor::onlyTrashed()->get();
+        return view('visitor.visitors_archived_list', compact('archivedVisitors'));
+    }
+
+    public function visitors_restore($id)
+    {
+        $visitor = Visitor::onlyTrashed()->findOrFail($id);
+        $visitor->restore();
+
+        return redirect()->back()->with('success', 'Visitor restored successfully.');
     }
 }

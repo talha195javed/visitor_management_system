@@ -120,39 +120,10 @@
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="">
-                <!-- Accordion for visitor filter -->
-                <!--<div class="accordion" id="visitorFilterAccordion">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse">
-                                Filter Visitors
-                            </button>
-                        </h2>
-                        <div id="filterCollapse" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#visitorFilterAccordion">
-                            <div class="accordion-body">
-                                <form method="GET" action="#">
-                                    <div class="mb-3">
-                                        <label for="status" class="form-label">Status</label>
-                                        <select class="form-select" id="status" name="status">
-                                            <option value="">All</option>
-                                            <option value="checked_in">Checked In</option>
-                                            <option value="checked_out">Checked Out</option>
-                                        </select>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Apply Filter</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>-->
-
                 <div class="card animated fadeInUp">
                     <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
-                        <h3 class="m-0">Visitor List</h3>
-                        <a href="{{ route('visitors.admin_pre_register') }}" class="btn btn-light btn-hover">Pre Register Visitor</a>
+                        <h3 class="m-0">Visitor CheckedIn List</h3>
                     </div>
-
-                    <!-- DataTable for visitor list -->
                     <div class="table-container">
                         <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
                             <thead>
@@ -162,7 +133,7 @@
                                 <th>Identification Number</th>
                                 <th>Contact #</th>
                                 <th>Status</th>
-                                <th>Actions</th>
+                                <th>Checked In Time</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -174,8 +145,7 @@
                                 <td>{{ $visitor->identification_number }}</td>
                                 <td>{{ $visitor->phone }}</td>
                                 <td>
-                                            <span class="badge {{ $visitor->check_out_time == '' && $visitor->check_in_time == '' ? 'bg-primary' :
-        ($visitor->check_out_time == '' ? 'bg-success' : 'bg-warning') }}">
+                                            <span class="badge {{ $visitor->check_out_time == '' ? 'bg-success' : 'bg-warning' }}">
                                                 @if($visitor->check_out_time == '' && $visitor->check_in_time == '')
                                                     {{ 'Waiting' }}
                                                 @elseif ($visitor->check_out_time == '')
@@ -185,19 +155,8 @@
                                                 @endif
                                             </span>
                                 </td>
-                                <td style="width: 10% !important;">
-                                    <!-- View Button -->
-                                    <a href="{{ route('visitors.show', $visitor->id) }}" class="btn btn-primary btn-sm btn-hover">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-
-                                    <!-- Archive Button -->
-                                    <form action="{{ route('visitors.archive', $visitor->id) }}" method="POST" class="d-inline-block archive-form">
-                                    @csrf
-                                        <button type="button" class="btn btn-danger btn-sm btn-hover archive-btn">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
+                                <td>
+                                    {{ \Carbon\Carbon::parse($visitor->check_in_time)->format('h:i A, d M Y') }}
                                 </td>
                             </tr>
                             @endforeach

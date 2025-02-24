@@ -3,22 +3,67 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
+    /**
+     * @return Factory|View|Application|\Illuminate\View\View
+     */
+
     public function index()
     {
-        $employees = Employee::all();
+        $employees = Employee::whereNull('deleted_at')->get();
         return view('employees.index', compact('employees'));
     }
 
-    public function create()
+    /**
+     * @return Factory|View|Application|\Illuminate\View\View
+     */
+
+    public function employers_list()
+    {
+        $employees = Employee::whereNull('deleted_at')->get();
+        return view('employees.employers_list', compact('employees'));
+    }
+
+    /**
+     * @return Factory|View|Application|\Illuminate\View\View
+     */
+    public function employers_archive_list()
+    {
+        $archivedEmployees = Employee::onlyTrashed()->get();
+        return view('employees.employers_archived_list', compact('archivedEmployees'));
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function employers_restore($id)
+    {
+        $employee = Employee::onlyTrashed()->findOrFail($id);
+        $employee->restore();
+
+        return redirect()->back()->with('success', 'Employee restored successfully.');
+    }
+
+    /**
+     * @return Factory|View|Application|\Illuminate\View\View
+     */
+    public function create_employee()
     {
         return view('employees.create');
     }
 
-    public function store(Request $request)
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function register_employee(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -28,21 +73,64 @@ class EmployeeController extends Controller
             'contact_number' => 'required|string|max:15',
         ]);
 
-        Employee::create($request->all());
+        $employee = new Employee();
+        $employee->name = $request->name;
+        $employee->company = $request->company;
+        $employee->email = $request->email;
+        $employee->contact_number = $request->contact_number;
+        $employee->position = $request->position;
+        $employee->save();
 
-        return redirect()->route('employees.index')->with('success', 'Employee added successfully');
+        return response()->json(['success' => true]);
     }
 
-    public function show(Employee $employee)
+    /**
+     * @param $id
+     * @return Factory|View|Application|\Illuminate\View\View
+     */
+    public function employee_show($id)
     {
-        return view('employees.show', compact('employee'));
+        $employee = Employee::findOrFail($id);
+        return view('employees.employee_show', compact('employee'));
     }
 
-    public function edit(Employee $employee)
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update_employee(Request $request)
     {
-        return view('employees.edit', compact('employee'));
+        {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'company' => 'required|string|max:255',
+                'email' => 'required|email',
+                'contact_number' => 'required|string|max:15',
+                'position' => 'required|string',
+            ]);
+
+            $employee = Employee::find($request->employee_id);
+
+            if ($employee) {
+                $employee->update([
+                    'name' => $validated['name'],
+                    'company' => $validated['company'],
+                    'email' => $validated['email'],
+                    'contact_number' => $validated['contact_number'],
+                    'position' => $validated['position'],
+                ]);
+                return response()->json(['success' => true]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Employee not found']);
+            }
+        }
     }
 
+    /**
+     * @param Request $request
+     * @param Employee $employee
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(Request $request, Employee $employee)
     {
         $request->validate([
@@ -58,9 +146,25 @@ class EmployeeController extends Controller
         return redirect()->route('employees.index')->with('success', 'Employee updated successfully');
     }
 
+    /**
+     * @param Employee $employee
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy(Employee $employee)
     {
         $employee->delete();
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully');
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function archive($id)
+    {
+        $employee = Employee::findOrFail($id);
+        $employee->delete(); // Soft delete the employee
+
+        return redirect()->back()->with('success', 'Employee archived successfully.');
     }
 }

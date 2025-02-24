@@ -1,7 +1,7 @@
 <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
         <li class="nav-item">
-            <a class="nav-link " href="#}">
+            <a class="nav-link " href="/home">
                 <i class="bi bi-grid"></i>
                 <span>Dashboard</span>
             </a>
@@ -32,6 +32,11 @@
                         <i class="bi bi-circle"></i><span>Checked Out's List</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('visitors_archive_list') }}">
+                        <i class="bi bi-circle"></i><span>Archive List</span>
+                    </a>
+                </li>
             </ul>
 
         </li>
@@ -41,8 +46,13 @@
             </a>
             <ul id="employees-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                 <li>
-                    <a href="#">
+                    <a href="{{ route('employers_list') }}">
                         <i class="bi bi-circle"></i><span>List</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('employers_archive_list') }}">
+                        <i class="bi bi-circle"></i><span>Archive List</span>
                     </a>
                 </li>
             </ul>
@@ -53,7 +63,7 @@
             </a>
             <ul id="admin-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                 <li>
-                    <a href="#">
+                    <a href="{{ route('admin.users.list') }}">
                         <i class="bi bi-circle"></i><span>User</span>
                     </a>
                 </li>
