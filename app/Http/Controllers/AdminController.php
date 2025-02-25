@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MailLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,6 +13,12 @@ class AdminController extends Controller
     {
         $users = User::all();
         return view('admin.user_list', compact('users'));
+    }
+
+    public function emails_list()
+    {
+        $emails = MailLog::all();
+        return view('admin.email_list', compact('emails'));
     }
 
     public function user_show($id)

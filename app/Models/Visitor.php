@@ -25,5 +25,10 @@ class Visitor extends Model
     ];
 
     protected $dates = ['deleted_at']; // This is optional in Laravel 11+
+
+    public function employers()
+    {
+        return $this->hasMany(VisitorsEmployer::class, 'visitor_id');
+    }
 }
 

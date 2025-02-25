@@ -19,14 +19,15 @@
 
             <!-- Employee Selection -->
             <div class="mb-3">
-                <label class="fw-semibold">Select Employee to Visit</label>
+                <label class="fw-semibold">Select Employee you have to Visit <br><br><span> (If not Confirmed please select HR)</span> <br><br></label>
                 <select name="employee_id" class="form-control input-field">
-                    @foreach($employees as $employee)
+                    @foreach($employees->sortBy('name') as $employee)
                     <option value="{{ $employee->id }}">
                         {{ $employee->name }} ({{ $employee->position }})
                     </option>
                     @endforeach
                 </select>
+
             </div>
 
             <!-- Proceed Button -->

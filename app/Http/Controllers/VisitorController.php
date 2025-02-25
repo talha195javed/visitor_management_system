@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminSuccessMail;
 use App\Models\Employee;
+use App\Models\MailLog;
 use App\Models\Visitor;
 use App\Models\VisitorsEmployer;
 use Carbon\Carbon;
@@ -10,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Mail\VisitorSuccessMail;
+use Illuminate\Support\Facades\Mail;
 
 class VisitorController extends Controller
 {
@@ -404,10 +408,43 @@ class VisitorController extends Controller
 
     public function visitor_success($id)
     {
-        // Find the visitor by ID
         $visitor = Visitor::findOrFail($id);
 
-        // Pass the visitor data to the view
+        $latestEmployer = $visitor->employers()->latest()->with('employee')->first();
+
+        $employee = $latestEmployer ? $latestEmployer->employee : null;
+
+        $recipientEmails = [$visitor->email];
+
+        if ($employee && $employee->email) {
+            $recipientEmails[] = $employee->email;
+        }
+
+        $recipientEmails[] = 'hr@gmail.com';
+
+        $toUser = $employee ? $employee->id : null;
+
+        // Send email to visitor, employee, and HR
+        foreach ($recipientEmails as $email) {
+            if ($email === $visitor->email) {
+                Mail::to($email)->send(new VisitorSuccessMail($visitor));
+            } elseif ($email === $employee->email) {
+                Mail::to($email)->send(new AdminSuccessMail($visitor));
+            } else {
+                Mail::to($email)->send(new AdminSuccessMail($visitor));
+            }
+        }
+
+        MailLog::create([
+            'to_email' => implode(', ', $recipientEmails), // Store all emails as a comma-separated string
+            'subject' => 'Visitor Registration Successful',
+            'body' => view('email.visitor_success', compact('visitor'))->render(),
+            'user_id' => $visitor->id,
+            'to_user' => $toUser,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         return view('visitor.visitor_success', compact('visitor'));
     }
 

@@ -16,4 +16,9 @@ class VisitorsEmployer extends Model
         'employee_id',
         'purpose'
     ];
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'employee_id');
+    }
 }

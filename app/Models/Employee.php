@@ -17,4 +17,10 @@ class Employee extends Model
 
     protected $dates = ['deleted_at']; // Stores the soft delete timestamp
 
+    public function visitors()
+    {
+        return $this->hasMany(VisitorsEmployer::class, 'employee_id');
+    }
+
+
 }

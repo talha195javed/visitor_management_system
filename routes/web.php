@@ -105,6 +105,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/users_list', [AdminController::class, 'users_list'])->name('users.list');
 
+    Route::get('/emails_list', [AdminController::class, 'emails_list'])->name('emails.list');
+
     Route::get('/user_show/{id}', [AdminController::class, 'user_show'])->name('users.user_show');
 
     Route::post('/user_store', [AdminController::class, 'store'])->name('users.store');
