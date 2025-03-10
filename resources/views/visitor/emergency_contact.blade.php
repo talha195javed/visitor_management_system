@@ -17,23 +17,20 @@
             <!-- Emergency Contact Name -->
             <div class="form-group d-flex align-items-center mb-3">
                 <input type="text" class="form-control" name="emergency_name" id="emergency_name" placeholder="Emergency Contact Name" value="{{ old('emergency_name') }}" required>
-                <input type="checkbox" class="ms-3 form-check-input step-checkbox" data-next="emergencyPhoneField">
             </div>
 
             <!-- Emergency Contact Phone -->
             <div id="emergencyPhoneField" class="form-group d-flex align-items-center mb-3 hidden">
                 <input type="text" class="form-control" name="emergency_phone" id="emergency_phone" placeholder="Emergency Contact Phone" value="{{ old('emergency_phone') }}" required>
-                <input type="checkbox" class="ms-3 form-check-input step-checkbox" data-next="emergencyRelationField">
             </div>
 
             <!-- Emergency Relation -->
             <div id="emergencyRelationField" class="form-group d-flex align-items-center mb-3 hidden">
                 <input type="text" class="form-control" name="emergency_relation" id="emergency_relation" placeholder="Relation to Visitor" value="{{ old('emergency_relation') }}" required>
-                <input type="checkbox" class="ms-3 form-check-input step-checkbox" data-next="submitButton">
             </div>
 
             <!-- Submit Button -->
-            <div id="submitButton" class="hidden">
+            <div id="submitButton" >
                 <button type="submit" class="btn btn-primary w-100 py-3">Save Emergency Contact</button>
             </div>
         </form>

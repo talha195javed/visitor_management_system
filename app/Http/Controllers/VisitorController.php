@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Mail;
 
 class VisitorController extends Controller
 {
+    /**
+     *
+     */
     public function __construct()
     {
         $this->middleware('auth')->except(['index',
@@ -28,42 +31,54 @@ class VisitorController extends Controller
             'storeAgreement', 'visitor_success']);
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function index()
     {
         return view('visitor.index');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function showCheckIn()
     {
-        // Get visitors who haven't checked in yet
         $preRegisteredVisitors = Visitor::whereNotNull('check_out_time')->get();
         return view('visitor.checkin', compact('preRegisteredVisitors'));
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function pre_registor_visitor(Request $request)
     {
-            $request->validate([
-                'full_name' => 'required',
-                'company' => 'required',
-                'email' => 'required|email',
-                'phone' => 'required',
-            ]);
-            $visitor = new Visitor();
-            $visitor->full_name = $request->full_name;
-            $visitor->company = $request->company;
-            $visitor->email = $request->email;
-            $visitor->phone = $request->phone;
-            $visitor->id_type = $request->id_type;
-            $visitor->identification_number = $request->identification_number;
-            $visitor->pre_register = 1;
-            $visitor->save();
+        $request->validate([
+            'full_name' => 'required',
+            'company' => 'required',
+            'email' => 'required|email',
+            'phone' => 'required',
+        ]);
+        $visitor = new Visitor();
+        $visitor->full_name = $request->full_name;
+        $visitor->company = $request->company;
+        $visitor->email = $request->email;
+        $visitor->phone = $request->phone;
+        $visitor->id_type = $request->id_type;
+        $visitor->identification_number = $request->identification_number;
+        $visitor->pre_register = 1;
+        $visitor->save();
 
         return response()->json(['success' => true]);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update_visitor(Request $request)
     {
-        // Validate the input data
         $validated = $request->validate([
             'full_name' => 'required|string|max:255',
             'company' => 'required|string|max:255',
@@ -73,11 +88,9 @@ class VisitorController extends Controller
             'identification_number' => 'required|string|max:255',
         ]);
 
-        // Find the visitor by the visitor ID and update their information
         $visitor = Visitor::find($request->visitor_id);
 
         if ($visitor) {
-            // Update the visitor's details
             $visitor->update([
                 'full_name' => $validated['full_name'],
                 'company' => $validated['company'],
@@ -87,14 +100,16 @@ class VisitorController extends Controller
                 'identification_number' => $validated['identification_number'],
             ]);
 
-            // Return a success response
             return response()->json(['success' => true]);
         } else {
-            // Return an error if the visitor was not found
             return response()->json(['success' => false, 'message' => 'Visitor not found']);
         }
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function storeCheckIn(Request $request)
     {
         try {
@@ -140,8 +155,10 @@ class VisitorController extends Controller
         }
     }
 
-
-
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function storeCheckOut(Request $request)
     {
         // Validate check-out request
@@ -157,6 +174,9 @@ class VisitorController extends Controller
         return redirect()->route('visitor.home')->with('success', 'Check-out successful!');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function showCheckOut()
     {
         // Get visitors who haven't checked out yet
@@ -164,11 +184,18 @@ class VisitorController extends Controller
         return view('visitor.checkout', compact('visitors'));
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function showPreRegistrationForm()
     {
         return view('visitor.pre-register');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function storePreRegistration(Request $request)
     {
         // Validate pre-registration data
@@ -197,6 +224,10 @@ class VisitorController extends Controller
         return redirect()->route('visitor.home')->with('success', 'Visitor pre-registered successfully!');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function uploadPhoto(Request $request)
     {
         $request->validate([
@@ -212,12 +243,21 @@ class VisitorController extends Controller
         return response()->json(['success' => false, 'message' => 'Upload failed'], 400);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function captureImageView($id)
     {
         $visitor = Visitor::findOrFail($id);
         return view('visitor.capture_image', compact('visitor'));
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function storeCapturedImage(Request $request, $id)
     {
         $visitor = Visitor::findOrFail($id);
@@ -251,12 +291,21 @@ class VisitorController extends Controller
         return response()->json(['success' => false, 'message' => 'No photo data received']);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function captureIdView($id)
     {
         $visitor = Visitor::findOrFail($id);
         return view('visitor.capture_id_image', compact('visitor'));
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function storeCapturedIdImage(Request $request, $id)
     {
         $visitor = Visitor::findOrFail($id);
@@ -290,12 +339,21 @@ class VisitorController extends Controller
         return response()->json(['success' => false, 'message' => 'No photo data received']);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function showRoleSelection($id)
     {
         $visitor = Visitor::findOrFail($id);
         return view('visitor.select_role', compact('visitor'));
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function setRole(Request $request, $id)
     {
         $visitor = Visitor::findOrFail($id);
@@ -310,6 +368,10 @@ class VisitorController extends Controller
         return redirect()->route('visitor.selectPurpose', ['id' => $id]);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function selectPurpose($id)
     {
         $visitor = Visitor::findOrFail($id);
@@ -317,7 +379,11 @@ class VisitorController extends Controller
         return view('visitor.select_purpose', compact('employees', 'visitor'));
     }
 
-    // Step 4: Store Purpose & Employee Selection in Session & Redirect to Capture Image
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function storePurpose(Request $request, $id)
     {
 
@@ -341,6 +407,10 @@ class VisitorController extends Controller
         return redirect()->route('visitor.captureImage', ['id' => $id]);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function checkPreRegistered(Request $request)
     {
         $visitor = Visitor::where('email', $request->email)->first();
@@ -355,14 +425,21 @@ class VisitorController extends Controller
         }
     }
 
-// Show the form for emergency contact details
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function showEmergencyContactForm($id)
     {
         $visitor = Visitor::findOrFail($id);  // Fetch the visitor by ID
         return view('visitor.emergency_contact', compact('visitor'));
     }
 
-// Store the emergency contact details for the visitor
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function storeEmergencyContact(Request $request, $id)
     {
         $request->validate([
@@ -382,6 +459,10 @@ class VisitorController extends Controller
         return redirect()->route('visitor.agreement', ['id' => $visitor->id]);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function showAgreement($id)
     {
         // Find the visitor by ID
@@ -391,6 +472,11 @@ class VisitorController extends Controller
         return view('visitor.agreement', compact('visitor'));
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function storeAgreement(Request $request, $id)
     {
         $request->validate([
@@ -406,6 +492,11 @@ class VisitorController extends Controller
         return redirect()->route('visitor.success', ['id' => $visitor->id]);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     * @throws \Throwable
+     */
     public function visitor_success($id)
     {
         $visitor = Visitor::findOrFail($id);
@@ -448,17 +539,26 @@ class VisitorController extends Controller
         return view('visitor.visitor_success', compact('visitor'));
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function admin_list()
     {
         $visitors = Visitor::whereNull('deleted_at')->get();
         return view('visitor.admin_list', compact('visitors'));
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function admin_preRegister()
     {
         return view('visitor.admin_pre_register');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function admin_checkedIn()
     {
         $visitors = Visitor::whereNull('check_out_time')
@@ -467,12 +567,19 @@ class VisitorController extends Controller
         return view('visitor.admin_checked_in', compact('visitors'));
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function admin_checkedOut()
     {
         $visitors = Visitor::whereNotNull('check_out_time')->get();
         return view('visitor.admin_checked_out', compact('visitors'));
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function admin_archive($id)
     {
         $visitor = Visitor::findOrFail($id);
@@ -480,6 +587,10 @@ class VisitorController extends Controller
         return redirect()->route('visitor.admin_list')->with('success', 'Visitor archived successfully!');
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function show($id)
     {
         $visitor = Visitor::findOrFail($id);
@@ -490,6 +601,10 @@ class VisitorController extends Controller
         return view('visitor.admin_visitor_show', compact('visitor', 'idPhotoPath', 'photoPath'));
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function archive($id)
     {
         $visitor = Visitor::findOrFail($id);
@@ -498,12 +613,19 @@ class VisitorController extends Controller
         return redirect()->back()->with('success', 'Visitor archived successfully.');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
+     */
     public function visitors_archive_list()
     {
         $archivedVisitors = Visitor::onlyTrashed()->get();
         return view('visitor.visitors_archived_list', compact('archivedVisitors'));
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function visitors_restore($id)
     {
         $visitor = Visitor::onlyTrashed()->findOrFail($id);
