@@ -1,7 +1,7 @@
 @extends('layouts.front_app')
 
 @section('content')
-<div class="container d-flex justify-content-center align-items-center vh-100">
+<div class="mainScreen container-fluid d-flex flex-column flex-md-row vh-100">
     <div class="card shadow-lg p-5 rounded-4" style="max-width: 800px;">
         <div class="text-center">
             <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Success" width="100" class="mb-4">
@@ -42,6 +42,13 @@
         background: linear-gradient(135deg, #5B86E5 0%, #36D1DC 100%);
         transform: translateY(-2px);
         transition: 0.3s;
+    }
+    .mainScreen {
+        background: url('{{ asset('assets/img/checkin6.jpg') }}') no-repeat center center;
+        background-size: cover;
+    }
+    .navbar-hidden {
+        display: none !important; /* Hide the navbar */
     }
 </style>
 

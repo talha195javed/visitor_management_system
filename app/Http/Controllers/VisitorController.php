@@ -14,9 +14,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Mail\VisitorSuccessMail;
 use Illuminate\Support\Facades\Mail;
+use App\Models\ScreenSetting;
 
 class VisitorController extends Controller
 {
+
+    protected $visibleFields;
     /**
      *
      */
@@ -29,6 +32,20 @@ class VisitorController extends Controller
             'captureIdView', 'storeCapturedIdImage', 'checkPreRegistered',
             'showEmergencyContactForm', 'storeEmergencyContact', 'showAgreement',
             'storeAgreement', 'visitor_success']);
+
+        $this->visibleFields = ScreenSetting::where('is_visible', true)
+            ->pluck('is_visible', 'screen_name')
+            ->toArray();
+    }
+
+    /**
+     * @param $fieldName
+     * @return false|mixed
+     */
+    public function checkFieldVisibility($fieldName)
+    {
+        // Check if the field exists and is visible
+        return $this->visibleFields[$fieldName] ?? false;
     }
 
     /**
@@ -54,12 +71,6 @@ class VisitorController extends Controller
      */
     public function pre_registor_visitor(Request $request)
     {
-        $request->validate([
-            'full_name' => 'required',
-            'company' => 'required',
-            'email' => 'required|email',
-            'phone' => 'required',
-        ]);
         $visitor = new Visitor();
         $visitor->full_name = $request->full_name;
         $visitor->company = $request->company;
@@ -79,15 +90,6 @@ class VisitorController extends Controller
      */
     public function update_visitor(Request $request)
     {
-        $validated = $request->validate([
-            'full_name' => 'required|string|max:255',
-            'company' => 'required|string|max:255',
-            'email' => 'required|email',
-            'phone' => 'required|string|max:15',
-            'id_type' => 'required|string',
-            'identification_number' => 'required|string|max:255',
-        ]);
-
         $visitor = Visitor::find($request->visitor_id);
 
         if ($visitor) {
@@ -113,45 +115,78 @@ class VisitorController extends Controller
     public function storeCheckIn(Request $request)
     {
         try {
-            $request->validate([
-                'full_name' => 'required',
-                'company' => 'required',
-                'email' => 'required|email',
-                'phone' => 'required',
-                'id_type' => 'required',
-                'identification_number' => 'required',
-            ]);
-
+            if(isset($request->email)) {
             $visitor = Visitor::where('email', $request->email)
                 ->where('pre_register', 1)
                 ->first();
+
             if ($visitor) {
+                if(isset($request->full_name)){
                 $visitor->full_name = $request->full_name;
-                $visitor->company = $request->company;
-                $visitor->phone = $request->phone;
-                $visitor->id_type = $request->id_type;
-                $visitor->identification_number = $request->identification_number;
+                } if(isset($request->company)) {
+                    $visitor->company = $request->company;
+                } if(isset($request->phone)) {
+                    $visitor->phone = $request->phone;
+                } if(isset($request->id_type)) {
+                    $visitor->id_type = $request->id_type;
+                } if(isset($request->identification_number)) {
+                    $visitor->identification_number = $request->identification_number;
+                }
                 $visitor->check_in_time = now();
                 $visitor->pre_register = 0;
                 $visitor->save();
             } else {
                 $visitor = new Visitor();
-                $visitor->full_name = $request->full_name;
-                $visitor->company = $request->company;
-                $visitor->email = $request->email;
-                $visitor->phone = $request->phone;
-                $visitor->id_type = $request->id_type;
-                $visitor->identification_number = $request->identification_number;
+                if(isset($request->full_name)){
+                    $visitor->full_name = $request->full_name;
+                } if(isset($request->company)) {
+                    $visitor->company = $request->company;
+                } if(isset($request->phone)) {
+                    $visitor->phone = $request->phone;
+                } if(isset($request->id_type)) {
+                    $visitor->id_type = $request->id_type;
+                } if(isset($request->identification_number)) {
+                    $visitor->identification_number = $request->identification_number;
+                }
+                $visitor->check_in_time = now();
+                $visitor->pre_register = 0;
+                $visitor->save();
+            }
+            } else {
+                $visitor = new Visitor();
+                if(isset($request->full_name)){
+                    $visitor->full_name = $request->full_name;
+                } if(isset($request->company)) {
+                    $visitor->company = $request->company;
+                } if(isset($request->phone)) {
+                    $visitor->phone = $request->phone;
+                } if(isset($request->id_type)) {
+                    $visitor->id_type = $request->id_type;
+                } if(isset($request->identification_number)) {
+                    $visitor->identification_number = $request->identification_number;
+                }
                 $visitor->check_in_time = now();
                 $visitor->pre_register = 0;
                 $visitor->save();
             }
 
-            // Redirect to image capture page with the visitor ID
-            return redirect()->route('visitor.selectRole', ['id' => $visitor->id]);
+            if ($this->checkFieldVisibility('select_role')) {
+                return redirect()->route('visitor.selectRole', ['id' => $visitor->id]);
+            } elseif ($this->checkFieldVisibility( 'select_purpose')) {
+                return redirect()->route('visitor.selectPurpose', ['id' => $visitor->id]);
+            } elseif ($this->checkFieldVisibility('capture_image')) {
+                return redirect()->route('visitor.captureImage', ['id' => $visitor->id]);
+            } elseif ($this->checkFieldVisibility('capture_id')) {
+                return redirect()->route('visitor.captureIdView', ['id' => $visitor->id]);
+            } elseif ($this->checkFieldVisibility('emergency_contact')) {
+                return redirect()->route('visitor.showEmergencyContact', ['id' => $visitor->id]);
+            } else {
+                return redirect()->route('visitor.agreement', ['id' => $visitor->id]);
+            }
+
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return back()->withInput()->withErrors(['email' => 'The email has already been taken.']);
+            return back()->withInput()->withErrors(['email' => 'There is some issue Please try Again later.']);
         }
     }
 
@@ -168,10 +203,15 @@ class VisitorController extends Controller
 
         // Find the visitor and mark them as checked out
         $visitor = Visitor::find($request->visitor_id);
+
+        if ($visitor->check_out_time) {
+            return response()->json(['success' => false, 'message' => 'You have already checked out.'], 400);
+        }
+
         $visitor->update(['check_out_time' => Carbon::now()]);
 
-        // Redirect to home page after check-out
-        return redirect()->route('visitor.home')->with('success', 'Check-out successful!');
+        // Return JSON response for AJAX success handling
+        return response()->json(['success' => true, 'message' => 'Check-out successful!']);
     }
 
     /**
@@ -183,6 +223,25 @@ class VisitorController extends Controller
         $visitors = Visitor::whereNull('check_out_time')->get();
         return view('visitor.checkout', compact('visitors'));
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
+
+        if (!$query) {
+            return response()->json([]);
+        }
+
+        $visitors = Visitor::where('full_name', 'LIKE', "%{$query}%")
+            ->whereNull('check_out_time') // Only visitors who haven't checked out
+            ->whereDate('created_at', Carbon::today()) // Only visitors from today
+            ->select('id', 'full_name')
+            ->limit(10)
+            ->get();
+
+        return response()->json($visitors);
+    }
+
 
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\View\View
@@ -198,16 +257,6 @@ class VisitorController extends Controller
      */
     public function storePreRegistration(Request $request)
     {
-        // Validate pre-registration data
-        $request->validate([
-            'full_name' => 'required|string|max:255',
-            'company' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'identification_number' => 'nullable|string|max:20',
-            'id_type' => 'nullable|string|max:20',
-        ]);
-
         // Create a new pre-registered visitor
         $visitor = Visitor::create([
             'full_name' => $request->full_name,
@@ -250,7 +299,8 @@ class VisitorController extends Controller
     public function captureImageView($id)
     {
         $visitor = Visitor::findOrFail($id);
-        return view('visitor.capture_image', compact('visitor'));
+        $visibleFields = $this->visibleFields;
+        return view('visitor.capture_image', compact('visitor', 'visibleFields'));
     }
 
     /**
@@ -297,8 +347,9 @@ class VisitorController extends Controller
      */
     public function captureIdView($id)
     {
+        $visibleFields = $this->visibleFields;
         $visitor = Visitor::findOrFail($id);
-        return view('visitor.capture_id_image', compact('visitor'));
+        return view('visitor.capture_id_image', compact('visitor', 'visibleFields'));
     }
 
     /**
@@ -365,7 +416,17 @@ class VisitorController extends Controller
 
         session(['visitor_role' => $request->role]);
 
-        return redirect()->route('visitor.selectPurpose', ['id' => $id]);
+        if ($this->checkFieldVisibility( 'select_purpose')) {
+            return redirect()->route('visitor.selectPurpose', ['id' => $id]);
+        } elseif ($this->checkFieldVisibility('capture_image')) {
+            return redirect()->route('visitor.captureImage', ['id' => $id]);
+        } elseif ($this->checkFieldVisibility('capture_id')) {
+            return redirect()->route('visitor.captureIdView', ['id' => $id]);
+        } elseif ($this->checkFieldVisibility('emergency_contact')) {
+            return redirect()->route('visitor.showEmergencyContact', ['id' => $id]);
+        } else {
+            return redirect()->route('visitor.agreement', ['id' => $id]);
+        }
     }
 
     /**
@@ -386,12 +447,6 @@ class VisitorController extends Controller
      */
     public function storePurpose(Request $request, $id)
     {
-
-        $request->validate([
-            'purpose' => 'required|string',
-            'employee_id' => 'required|exists:employees,id'
-        ]);
-
         session([
             'visit_purpose' => $request->purpose,
             'employee_id' => $request->employee_id,
@@ -404,7 +459,15 @@ class VisitorController extends Controller
             'purpose' => $request->purpose,
         ]);
 
-        return redirect()->route('visitor.captureImage', ['id' => $id]);
+        if ($this->checkFieldVisibility('capture_image')) {
+            return redirect()->route('visitor.captureImage', ['id' => $id]);
+        } elseif ($this->checkFieldVisibility('capture_id')) {
+            return redirect()->route('visitor.captureIdView', ['id' => $id]);
+        } elseif ($this->checkFieldVisibility('emergency_contact')) {
+            return redirect()->route('visitor.showEmergencyContact', ['id' => $id]);
+        } else {
+            return redirect()->route('visitor.agreement', ['id' => $id]);
+        }
     }
 
     /**
@@ -442,12 +505,6 @@ class VisitorController extends Controller
      */
     public function storeEmergencyContact(Request $request, $id)
     {
-        $request->validate([
-            'emergency_name' => 'required',
-            'emergency_phone' => 'required',
-            'emergency_relation' => 'required',
-        ]);
-
         // Find the visitor by ID and store emergency contact details
         $visitor = Visitor::findOrFail($id);
         $visitor->emergency_name = $request->emergency_name;
@@ -516,15 +573,15 @@ class VisitorController extends Controller
         $toUser = $employee ? $employee->id : null;
 
         // Send email to visitor, employee, and HR
-        foreach ($recipientEmails as $email) {
-            if ($email === $visitor->email) {
-                Mail::to($email)->send(new VisitorSuccessMail($visitor));
-            } elseif ($email === $employee->email) {
-                Mail::to($email)->send(new AdminSuccessMail($visitor));
-            } else {
-                Mail::to($email)->send(new AdminSuccessMail($visitor));
-            }
-        }
+//        foreach ($recipientEmails as $email) {
+//            if ($email === $visitor->email) {
+//                Mail::to($email)->send(new VisitorSuccessMail($visitor));
+//            } elseif ($email === $employee->email) {
+//                Mail::to($email)->send(new AdminSuccessMail($visitor));
+//            } else {
+//                Mail::to($email)->send(new AdminSuccessMail($visitor));
+//            }
+//        }
 
         MailLog::create([
             'to_email' => implode(', ', $recipientEmails), // Store all emails as a comma-separated string

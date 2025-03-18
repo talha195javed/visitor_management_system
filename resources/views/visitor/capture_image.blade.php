@@ -1,7 +1,7 @@
 @extends('layouts.front_app')
 
 @section('content')
-<div class="container d-flex justify-content-center align-items-center min-vh-100">
+<div id="mainScreen" class="container-fluid d-flex flex-column flex-md-row justify-content-center align-items-center vh-100 ps-0">    <div class="card p-4 shadow-lg rounded-4 border-0" style="max-width: 500px; background: #fff; transition: 0.3s;">
     <div class="card p-4 shadow-lg rounded-4 border-0 text-center" style="max-width: 500px; background: #fff;">
 
         <!-- Title -->
@@ -41,7 +41,9 @@
 
 <!-- WebcamJS -->
 <script type="text/javascript" src="https://cdn.rawgit.com/jhuckaby/webcamjs/master/webcam.min.js"></script>
-
+<script>
+    var visibleFields = @json($visibleFields);
+</script>
 <script type="text/javascript">
     // Webcam Setup
     Webcam.set({
@@ -89,8 +91,13 @@
             .then(data => {
                 loadingIndicator.style.display = "none"; // Hide loading
                 if (data.success) {
-                    alert("Photo uploaded successfully!");
-                    window.location.href = "{{ route('visitor.captureIdView', ':id') }}".replace(':id', visitorId);
+                    if (visibleFields['capture_id']) {
+                        window.location.href = "{{ route('visitor.captureIdView', ':id') }}".replace(':id', visitorId);
+                    } else if (visibleFields['emergency_contact']) {
+                        window.location.href = "{{ route('visitor.showEmergencyContact', ':id') }}".replace(':id', visitorId);
+                    } else {
+                        window.location.href = "{{ route('visitor.agreement', ':id') }}".replace(':id', visitorId);
+                    }
                 } else {
                     alert("Error: " + data.message);
                 }
@@ -123,6 +130,15 @@
     .capture-btn:active, .save-btn:active {
         transform: translateY(1px);
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    #mainScreen {
+        background: url('{{ asset('assets/img/checkin6.jpg') }}') no-repeat center center;
+        background-size: cover;
+        position: relative;
+        color: #fff;
+    }
+    .navbar-hidden {
+        display: none !important; /* Hide the navbar */
     }
 </style>
 @endsection

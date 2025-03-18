@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\FieldSettingController;
 
 // Landing Page
 // Rename the visitor home route
@@ -113,3 +114,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 Route::post('/update-user', [AdminController::class, 'update_user'])->name('users.update_user');
 
+Route::get('/admin/field-visibility', [FieldSettingController::class, 'index'])->name('admin.field_visibility');
+Route::post('/admin/field-visibility/update', [FieldSettingController::class, 'update'])->name('admin.update_field_visibility');
+
+Route::get('/visitor/search', [VisitorController::class, 'search'])->name('visitor.search');

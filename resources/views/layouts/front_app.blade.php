@@ -99,7 +99,7 @@
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm navbar-hidden">
     <div class="container">
         <a class="navbar-brand" href="{{ route('visitor.home') }}">
             <i class="fas fa-user-check me-2"></i>Visitor Management

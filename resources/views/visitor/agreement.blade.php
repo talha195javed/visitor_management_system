@@ -1,16 +1,11 @@
 @extends('layouts.front_app')
 
 @section('content')
-<div class="container-fluid d-flex flex-column flex-md-row vh-100">
-    <!-- Left Column: Agreement Information -->
-    <div class="col-md-6 d-flex justify-content-center align-items-center bg-custom-gradient text-white p-5 h-50 rounded-5">
-        <div class="text-center">
-            <h2 class="fw-bold mb-4">Visitor Agreement</h2>
-            <p class="lead">Please read and accept the following terms and conditions to proceed with your visit.</p>
-        </div>
+<div class="mainScreen container-fluid d-flex flex-column flex-md-row vh-100">
+
+    <div class="col-md-3">
     </div>
 
-    <!-- Right Column: Agreement Form -->
     <div class="col-md-6 d-flex flex-column justify-content-center p-5">
         <form action="{{ route('visitor.storeAgreement', ['id' => $visitor->id]) }}" method="POST" class="shadow-lg p-4 rounded-4 bg-white">
             @csrf
@@ -35,6 +30,9 @@
             <button type="submit" class="btn btn-primary w-100 py-3">Confirm and Proceed</button>
         </form>
     </div>
+
+    <div class="col-md-3">
+    </div>
 </div>
 <style>
     body {
@@ -55,6 +53,13 @@
     .btn-primary:hover {
         background: linear-gradient(135deg, #e60578, #36b3ef);
         transform: scale(1.05);
+    }
+    .mainScreen {
+        background: url('{{ asset('assets/img/checkin6.jpg') }}') no-repeat center center;
+        background-size: cover;
+    }
+    .navbar-hidden {
+        display: none !important; /* Hide the navbar */
     }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

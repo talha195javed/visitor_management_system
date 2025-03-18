@@ -72,15 +72,23 @@
                         <i class="bi bi-circle"></i><span>Email Logs</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.field_visibility') }}">
+                        <i class="bi bi-circle"></i><span>Configuration</span>
+                    </a>
+                </li>
             </ul>
         </li>
 
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#">
-                <i class="bi bi-box-arrow-in-right"></i>
-                <span>Logout</span>
+            <a class="dropdown-item" href="{{ route('logout') }}"
+               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="bi bi-box-arrow-in-right"></i> Logout
             </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                @csrf
+            </form>
         </li><!-- End Logout Nav -->
     </ul>
 </aside>
