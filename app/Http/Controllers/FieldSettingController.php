@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CompanyInfo;
 use App\Models\ScreenSetting;
 use Illuminate\Http\Request;
 use App\Models\FieldSetting;
@@ -15,6 +16,11 @@ class FieldSettingController extends Controller
         $screens = ScreenSetting::all();
         $fields = FieldSetting::all()->groupBy('screen_type');
         return view('visitor.field_settings', compact('fields', 'screens'));
+    }
+
+    public function company_index() {
+        $companyInfo = CompanyInfo::first();
+        return view('visitor.company_settings', compact('companyInfo'));
     }
 
     /**

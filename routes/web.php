@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CompanyInfoController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
@@ -115,6 +116,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::post('/update-user', [AdminController::class, 'update_user'])->name('users.update_user');
 
 Route::get('/admin/field-visibility', [FieldSettingController::class, 'index'])->name('admin.field_visibility');
+
+Route::get('/admin/company-setting', [FieldSettingController::class, 'company_index'])->name('admin.company_setting');
+
 Route::post('/admin/field-visibility/update', [FieldSettingController::class, 'update'])->name('admin.update_field_visibility');
 
 Route::get('/visitor/search', [VisitorController::class, 'search'])->name('visitor.search');
+
+Route::post('/company-info/upload', [CompanyInfoController::class, 'uploadImages'])->name('company_info.upload');
+

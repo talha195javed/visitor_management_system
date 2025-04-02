@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\AdminSuccessMail;
 use App\Models\Employee;
+use App\Models\FieldSetting;
 use App\Models\MailLog;
 use App\Models\Visitor;
 use App\Models\VisitorsEmployer;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Mail\VisitorSuccessMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\ScreenSetting;
+
 
 class VisitorController extends Controller
 {
@@ -31,7 +33,9 @@ class VisitorController extends Controller
             'showRoleSelection', 'setRole', 'selectPurpose', 'storePurpose',
             'captureIdView', 'storeCapturedIdImage', 'checkPreRegistered',
             'showEmergencyContactForm', 'storeEmergencyContact', 'showAgreement',
-            'storeAgreement', 'visitor_success']);
+            'storeAgreement', 'visitor_success', 'getVisibleFields', 'storeAppCheckin', 'setAppRoleAssign',
+            'selctAppEmployee', 'setAppPurpose', 'storeAppCapturedImage', 'storeAppCapturedIDImage',
+            'appEmergencyContact', 'appPrivacyAgreement']);
 
         $this->visibleFields = ScreenSetting::where('is_visible', true)
             ->pluck('is_visible', 'screen_name')
@@ -403,7 +407,7 @@ class VisitorController extends Controller
     /**
      * @param Request $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate \Http\RedirectResponse
      */
     public function setRole(Request $request, $id)
     {
@@ -455,7 +459,7 @@ class VisitorController extends Controller
 
         VisitorsEmployer::create([
             'visitor_id' => $id,
-            'employee_id' => $request->employee_id,
+            'employee_id' => $request->employee_id ?? 1,
             'purpose' => $request->purpose,
         ]);
 
@@ -689,5 +693,243 @@ class VisitorController extends Controller
         $visitor->restore();
 
         return redirect()->back()->with('success', 'Visitor restored successfully.');
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getVisibleFields()
+    {
+        $visibleFields = FieldSetting::where('is_visible', true)->pluck('field_name')->toArray();
+        return response()->json(['fields' => $visibleFields]);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeAppCheckin(Request $request)
+    {
+        $validated = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'company' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'id_type' => 'nullable|string|max:50',
+            'identification_number' => 'nullable|string|max:50',
+        ]);
+
+        $visibleFields = ScreenSetting::where('is_visible', true)
+            ->pluck('screen_name')
+            ->toArray();
+
+        $visitor = Visitor::create($validated);
+
+        return response()->json([
+            'visitor_id' => $visitor->id,
+            'visitor' => $visitor,
+            'visibleFields' => $visibleFields
+        ], 201);
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setAppRoleSelection()
+    {
+        $roles = FieldSetting::where('is_visible', true)->pluck('field_name')->toArray();
+        return response()->json(['fields' => $visibleFields]);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setAppRoleAssign(Request $request)
+    {
+        $visitor = Visitor::findOrFail($request->visitor_id);
+
+        // Set the role from the request
+        $visitor->role = $request->role;
+        $visitor->save();
+
+        $visibleFields = ScreenSetting::where('is_visible', true)
+            ->pluck('screen_name')
+            ->toArray();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Role assigned successfully',
+            'visitor_id' => $request->visitor_id,
+            'visibleFields' => $visibleFields
+        ], 200);
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function selctAppEmployee()
+    {
+        $employees = Employee::all();
+        return response()->json(['employees' => $employees]);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setAppPurpose(Request $request)
+    {
+        $visitorId = $request->visitor_id;
+
+        session([
+            'visit_purpose' => $request->purpose,
+            'employee_id' => $request->employee_id ?? 1,
+            'user_id' => $visitorId, // Using visitor_id as the user_id
+        ]);
+
+        VisitorsEmployer::create([
+            'visitor_id' => $visitorId,  // Store visitor_id in the table
+            'employee_id' => $request->employee_id ?? 1,
+            'purpose' => $request->purpose,
+        ]);
+
+        $visibleFields = ScreenSetting::where('is_visible', true)
+            ->pluck('screen_name')
+            ->toArray();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Role assigned successfully',
+            'visitor_id' => $request->visitor_id,
+            'visibleFields' => $visibleFields
+        ], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+
+    public function storeAppCapturedImage(Request $request)
+    {
+
+        $visitor = Visitor::findOrFail($request->visitor_id);
+
+        if ($request->hasFile('photo')) {
+            $imageFile = $request->file('photo');
+
+            // Generate unique image name
+            $imageName = 'visitor_' . $request->visitor_id . '_' . time() . '.' . $imageFile->getClientOriginalExtension();
+
+            // Define storage path
+            $imagePath = 'assets/visitor_photos/' . $imageName;
+
+            // Move the image to the public directory
+            $imageFile->move(public_path('assets/visitor_photos'), $imageName);
+
+            // Save image path in database
+            $visitor->photo = $imageName;
+            $visitor->save();
+
+            // Get visible screen fields
+            $visibleFields = ScreenSetting::where('is_visible', true)->pluck('screen_name')->toArray();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Photo uploaded successfully!',
+                'visitor_id' => $request->visitor_id,
+                'photo_url' => asset($imagePath), // Return full URL for frontend use
+                'visibleFields' => $visibleFields
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No photo uploaded.'
+        ], 400);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+
+    public function storeAppCapturedIDImage(Request $request)
+    {
+
+        $visitor = Visitor::findOrFail($request->visitor_id);
+
+        if ($request->hasFile('photo')) {
+            $imageFile = $request->file('photo');
+
+            // Generate unique image name
+            $imageName = 'visitor_' . $request->visitor_id . '_' . time() . '.' . $imageFile->getClientOriginalExtension();
+
+            // Define storage path
+            $imagePath = 'assets/visitor_photos/' . $imageName;
+
+            // Move the image to the public directory
+            $imageFile->move(public_path('assets/visitor_photos'), $imageName);
+
+            // Save image path in database
+            $visitor->id_photo = $imageName;
+            $visitor->save();
+
+            // Get visible screen fields
+            $visibleFields = ScreenSetting::where('is_visible', true)->pluck('screen_name')->toArray();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Photo uploaded successfully!',
+                'visitor_id' => $request->visitor_id,
+                'photo_url' => asset($imagePath), // Return full URL for frontend use
+                'visibleFields' => $visibleFields
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No photo uploaded.'
+        ], 400);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function appEmergencyContact(Request $request)
+    {
+        $visitor = Visitor::findOrFail($request->visitor_id);
+
+        // Set the role from the request
+        $visitor->emergency_name = $request->emergency_name;
+        $visitor->emergency_phone = $request->emergency_phone;
+        $visitor->emergency_relation = $request->emergency_relation;
+        $visitor->save();
+
+        $visibleFields = ScreenSetting::where('is_visible', true)
+            ->pluck('screen_name')
+            ->toArray();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Saved successfully',
+            'visitor_id' => $request->visitor_id,
+            'visibleFields' => $visibleFields
+        ], 200);
+    }
+
+    public function appPrivacyAgreement(Request $request)
+    {
+        $visitor = Visitor::findOrFail($request->visitor_id);
+        $visitor->privacy_policy_agreement = true;
+        $visitor->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Saved successfully',
+            'visitor' => $visitor
+        ], 200);
     }
 }

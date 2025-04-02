@@ -3,6 +3,8 @@
 @section('content')
 <div id="mainScreen" class="container-fluid d-flex flex-column flex-md-row justify-content-center align-items-center vh-100 ps-0">    <div class="card p-4 shadow-lg rounded-4 border-0" style="max-width: 500px; background: #fff; transition: 0.3s;">
 
+        <h2 class="fw-bold mb-3">Emergency Contact Details</h2>
+        <p class="text-muted">Please Provide Emergency Contact Details</p>
     @php
     use App\Models\FieldSetting;
     $visibleFields = FieldSetting::where('is_visible', true)->pluck('field_name')->toArray();
@@ -68,7 +70,7 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
     #mainScreen {
-        background: url('{{ asset('assets/img/checkin6.jpg') }}') no-repeat center center;
+        background: url('{{ asset('assets/visitor_photos/remaining_screen_image.jpg') }}') no-repeat center center;
         background-size: cover;
         position: relative;
         color: #fff;

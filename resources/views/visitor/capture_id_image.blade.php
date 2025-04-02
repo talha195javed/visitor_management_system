@@ -218,7 +218,7 @@
     }
 
     #mainScreen {
-        background: url('{{ asset('assets/img/checkin6.jpg') }}') no-repeat center center;
+        background: url('{{ asset('assets/visitor_photos/remaining_screen_image.jpg') }}') no-repeat center center;
         background-size: cover;
         position: relative;
         color: #fff;

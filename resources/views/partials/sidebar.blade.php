@@ -77,6 +77,11 @@
                         <i class="bi bi-circle"></i><span>Configuration</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.company_setting') }}">
+                        <i class="bi bi-circle"></i><span>Company Settings</span>
+                    </a>
+                </li>
             </ul>
         </li>
 

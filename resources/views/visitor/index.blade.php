@@ -136,7 +136,7 @@ $visibleFields = ScreenSetting::where('is_visible', true)->pluck('screen_name')-
         }
     }
     #mainScreen {
-        background: url('{{ asset('assets/img/welcome1.jpg') }}') no-repeat center center;
+        background: url('{{ asset('assets/visitor_photos/main_screen_image.jpg') }}') no-repeat center center;
         background-size: cover;
         position: relative;
         color: #fff;
@@ -145,7 +145,7 @@ $visibleFields = ScreenSetting::where('is_visible', true)->pluck('screen_name')-
         position: fixed;
         width: 100%;
         height: 100vh;
-        background: url('{{ asset('assets/img/welcome2.webp') }}') no-repeat center center;
+        background: url('{{ asset('assets/visitor_photos/welcome_screen_image.jpg') }}') no-repeat center center;
         background-size: cover;
         background-attachment: fixed;
         text-align: center;
