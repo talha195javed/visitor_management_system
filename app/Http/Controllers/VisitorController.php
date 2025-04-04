@@ -35,7 +35,7 @@ class VisitorController extends Controller
             'showEmergencyContactForm', 'storeEmergencyContact', 'showAgreement',
             'storeAgreement', 'visitor_success', 'getVisibleFields', 'storeAppCheckin', 'setAppRoleAssign',
             'selctAppEmployee', 'setAppPurpose', 'storeAppCapturedImage', 'storeAppCapturedIDImage',
-            'appEmergencyContact', 'appPrivacyAgreement']);
+            'appEmergencyContact', 'appPrivacyAgreement', 'search_visitor']);
 
         $this->visibleFields = ScreenSetting::where('is_visible', true)
             ->pluck('is_visible', 'screen_name')
@@ -228,23 +228,33 @@ class VisitorController extends Controller
         return view('visitor.checkout', compact('visitors'));
     }
 
-    public function search(Request $request)
+    public function search_visitor(Request $request)
     {
         $query = $request->input('q');
+        $searchBy = $request->input('searchBy', 'name'); // Default to name search
 
         if (!$query) {
             return response()->json([]);
         }
 
-        $visitors = Visitor::where('full_name', 'LIKE', "%{$query}%")
-            ->whereNull('check_out_time') // Only visitors who haven't checked out
-            ->whereDate('created_at', Carbon::today()) // Only visitors from today
+        $visitorsQuery = Visitor::whereNull('check_out_time') // Only visitors who haven't checked out
+        ->whereDate('created_at', Carbon::today());
+
+        // Check if searching by name or ID
+        if ($searchBy === 'id') {
+            $visitorsQuery->where('id', 'LIKE', "%{$query}%");
+        } else {
+            $visitorsQuery->where('full_name', 'LIKE', "%{$query}%");
+        }
+
+        $visitors = $visitorsQuery
             ->select('id', 'full_name')
             ->limit(10)
             ->get();
 
         return response()->json($visitors);
     }
+
 
 
     /**

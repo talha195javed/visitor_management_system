@@ -121,7 +121,7 @@ Route::get('/admin/company-setting', [FieldSettingController::class, 'company_in
 
 Route::post('/admin/field-visibility/update', [FieldSettingController::class, 'update'])->name('admin.update_field_visibility');
 
-Route::get('/visitor/search', [VisitorController::class, 'search'])->name('visitor.search');
+Route::get('/visitor/search', [VisitorController::class, 'search_visitor'])->name('visitor.search');
 
 Route::post('/company-info/upload', [CompanyInfoController::class, 'uploadImages'])->name('company_info.upload');
 

@@ -5,10 +5,10 @@
     <div class="card shadow-lg p-5 rounded-4" style="max-width: 800px;">
     <div class="text-center">
         <h1 class="mb-4">Visitor Check-Out</h1>
-        <p>Enter your name and select from the dropdown to check out.</p>
+        <p>Enter your Visitor ID or Visitor Name to Checkout.</p>
 
-        <!-- Search Input -->
-        <input type="text" id="visitorSearch" class="form-control mb-2" placeholder="Enter your name" autocomplete="off">
+        <input type="text" id="visitorIdSearch" class="form-control mb-2" placeholder="Enter Visitor ID" autocomplete="off">
+        <input type="text" id="visitorNameSearch" class="form-control mb-2" placeholder="Enter Visitor Name" autocomplete="off">
 
         <!-- Dropdown for Search Results -->
         <div id="searchResults" class="list-group position-absolute w-50 mx-auto"></div>
@@ -29,35 +29,41 @@
 <!-- JavaScript -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const searchInput = document.getElementById("visitorSearch");
+        const visitorIdSearch = document.getElementById("visitorIdSearch");
+        const visitorNameSearch = document.getElementById("visitorNameSearch");
         const searchResults = document.getElementById("searchResults");
         const selectedVisitorId = document.getElementById("selectedVisitorId");
         const checkoutButton = document.getElementById("checkoutButton");
-        const checkoutForm = document.getElementById("checkoutForm");
 
-        searchInput.addEventListener("input", function() {
-            let query = searchInput.value.trim();
+        function searchVisitors(query, searchBy) {
             if (query.length < 2) {
                 searchResults.innerHTML = "";
                 return;
             }
 
-            // Fetch matching visitors
-            fetch("{{ route('visitor.search') }}?q=" + query)
+            fetch(`{{ route('visitor.search') }}?q=${query}&searchBy=${searchBy}`)
                 .then(response => response.json())
                 .then(data => {
                     searchResults.innerHTML = "";
+
                     if (data.length > 0) {
+                        // Add table headings
+                        let heading = document.createElement("div");
+                        heading.classList.add("list-group-item", "active");
+                        heading.innerHTML = `<strong>Visitor ID</strong> | <strong>Visitor Name</strong>`;
+                        searchResults.appendChild(heading);
+
                         data.forEach(visitor => {
                             let item = document.createElement("a");
                             item.href = "#";
                             item.classList.add("list-group-item", "list-group-item-action");
-                            item.textContent = visitor.full_name;
+                            item.innerHTML = `<strong>${visitor.id}</strong> | ${visitor.full_name}`;
                             item.dataset.id = visitor.id;
 
                             item.addEventListener("click", function(e) {
                                 e.preventDefault();
-                                searchInput.value = visitor.full_name;
+                                visitorIdSearch.value = visitor.id;
+                                visitorNameSearch.value = visitor.full_name;
                                 selectedVisitorId.value = visitor.id;
                                 checkoutButton.removeAttribute("disabled");
                                 searchResults.innerHTML = "";
@@ -67,66 +73,33 @@
                         });
                     }
                 })
-                .catch(error => console.error("Error:", error));
+                .catch(error => console.error("Fetch Error:", error));
+        }
+
+        // Disable one field when the other is being used
+        visitorIdSearch.addEventListener("input", function() {
+            if (visitorIdSearch.value.trim() !== "") {
+                visitorNameSearch.setAttribute("disabled", "true");
+            } else {
+                visitorNameSearch.removeAttribute("disabled");
+            }
+            searchVisitors(visitorIdSearch.value.trim(), "id");
+        });
+
+        visitorNameSearch.addEventListener("input", function() {
+            if (visitorNameSearch.value.trim() !== "") {
+                visitorIdSearch.setAttribute("disabled", "true");
+            } else {
+                visitorIdSearch.removeAttribute("disabled");
+            }
+            searchVisitors(visitorNameSearch.value.trim(), "name");
         });
 
         // Hide dropdown when clicking outside
         document.addEventListener("click", function(e) {
-            if (!searchResults.contains(e.target) && e.target !== searchInput) {
+            if (!searchResults.contains(e.target) && e.target !== visitorIdSearch && e.target !== visitorNameSearch) {
                 searchResults.innerHTML = "";
             }
-        });
-
-        // Handle form submission via AJAX
-        checkoutForm.addEventListener("submit", function(e) {
-            e.preventDefault();
-
-            let visitorId = selectedVisitorId.value;
-            if (!visitorId) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops!",
-                    text: "Please select a visitor before checking out."
-                });
-                return;
-            }
-
-            fetch("{{ route('visitor.storeCheckOut') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
-                },
-                body: JSON.stringify({ visitor_id: visitorId })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Success!",
-                            text: "You have successfully checked out.",
-                            showConfirmButton: false,
-                            timer: 2000
-                        }).then(() => {
-                            window.location.href = "{{ route('visitor.home') }}";
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Error!",
-                            text: data.message || "Something went wrong."
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops!",
-                        text: "There was an issue processing your request."
-                    });
-                });
         });
     });
 </script>

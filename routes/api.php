@@ -29,3 +29,20 @@ Route::post('/visitor/storeAppCapturedIDImage', [VisitorController::class, 'stor
 Route::post('/visitor/appEmergencyContact', [VisitorController::class, 'appEmergencyContact']);
 
 Route::post('/visitor/appPrivacyAgreement', [VisitorController::class, 'appPrivacyAgreement']);
+
+Route::post('/visitor/search_visitor', [VisitorController::class, 'search_visitor']);
+
+Route::get('/visitor/search', function (Request $request) {
+    $query = $request->query('q');
+    $searchBy = $request->query('searchBy');
+
+    if (!$query) {
+        return response()->json([]);
+    }
+
+    $visitors = ($searchBy === 'id')
+        ? Visitor::where('id', 'LIKE', "%{$query}%")->get()
+        : Visitor::where('full_name', 'LIKE', "%{$query}%")->get();
+
+    return response()->json($visitors);
+});
