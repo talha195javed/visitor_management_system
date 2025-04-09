@@ -1,0 +1,19 @@
+body {
+    background: linear-gradient(to right, #c6dbed, #00f2fe);
+    font-family: 'Poppins', sans-serif;
+}
+.bg-custom-gradient {
+    background: linear-gradient(135deg, #f06, #48c6ef, #6f86d6) !important;
+}
+.text-white { color: white !important; }
+.form-check-input {
+    transform: scale(1.2);
+}
+.btn-primary {
+    background: linear-gradient(135deg, #f06, #48c6ef);
+    border: none;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, #e60578, #36b3ef);
+    transform: scale(1.05);
+}

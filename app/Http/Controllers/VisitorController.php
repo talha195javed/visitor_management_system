@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\AdminSuccessMail;
+use App\Models\CompanyInfo;
 use App\Models\Employee;
 use App\Models\FieldSetting;
 use App\Models\MailLog;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Mail\VisitorSuccessMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\ScreenSetting;
+use Webpatser\Countries\Countries;
 
 
 class VisitorController extends Controller
@@ -66,7 +68,8 @@ class VisitorController extends Controller
     public function showCheckIn()
     {
         $preRegisteredVisitors = Visitor::whereNotNull('check_out_time')->get();
-        return view('visitor.checkin', compact('preRegisteredVisitors'));
+        $countries = Countries::getCountries();
+        return view('visitor.checkin', compact('preRegisteredVisitors', 'countries'));
     }
 
     /**
@@ -80,6 +83,7 @@ class VisitorController extends Controller
         $visitor->company = $request->company;
         $visitor->email = $request->email;
         $visitor->phone = $request->phone;
+        $visitor->country_code = $request->country_code;
         $visitor->id_type = $request->id_type;
         $visitor->identification_number = $request->identification_number;
         $visitor->pre_register = 1;
@@ -131,6 +135,8 @@ class VisitorController extends Controller
                     $visitor->company = $request->company;
                 } if(isset($request->phone)) {
                     $visitor->phone = $request->phone;
+                } if(isset($request->country_code)) {
+                    $visitor->country_code = $request->country_code;
                 } if(isset($request->id_type)) {
                     $visitor->id_type = $request->id_type;
                 } if(isset($request->identification_number)) {
@@ -147,6 +153,8 @@ class VisitorController extends Controller
                     $visitor->company = $request->company;
                 } if(isset($request->phone)) {
                     $visitor->phone = $request->phone;
+                } if(isset($request->country_code)) {
+                    $visitor->country_code = $request->country_code;
                 } if(isset($request->id_type)) {
                     $visitor->id_type = $request->id_type;
                 } if(isset($request->identification_number)) {
@@ -164,6 +172,8 @@ class VisitorController extends Controller
                     $visitor->company = $request->company;
                 } if(isset($request->phone)) {
                     $visitor->phone = $request->phone;
+                } if(isset($request->country_code)) {
+                    $visitor->country_code = $request->country_code;
                 } if(isset($request->id_type)) {
                     $visitor->id_type = $request->id_type;
                 } if(isset($request->identification_number)) {
@@ -248,7 +258,7 @@ class VisitorController extends Controller
         }
 
         $visitors = $visitorsQuery
-            ->select('id', 'full_name')
+            ->select('id', 'full_name', 'check_in_time')
             ->limit(10)
             ->get();
 
@@ -277,6 +287,7 @@ class VisitorController extends Controller
             'company' => $request->company,
             'email' => $request->email,
             'phone' => $request->phone,
+            'country_code' => $request->country_code,
             'identification_number' => $request->identification_number,
             'id_type' => $request->id_type,
             'check_in_time' => null, // Pre-registered visitor hasn't checked in yet
@@ -570,6 +581,8 @@ class VisitorController extends Controller
      */
     public function visitor_success($id)
     {
+        $company_info = CompanyInfo::first();
+
         $visitor = Visitor::findOrFail($id);
 
         $latestEmployer = $visitor->employers()->latest()->with('employee')->first();
@@ -582,9 +595,13 @@ class VisitorController extends Controller
             $recipientEmails[] = $employee->email;
         }
 
-        $recipientEmails[] = 'hr@gmail.com';
+        $recipientEmails[] = $company_info->hr_email;
 
         $toUser = $employee ? $employee->id : null;
+
+        if (empty($toUser) && $company_info && $company_info->hr_email) {
+            $toUser = $company_info->hr_email;
+        }
 
         // Send email to visitor, employee, and HR
 //        foreach ($recipientEmails as $email) {
@@ -615,7 +632,9 @@ class VisitorController extends Controller
      */
     public function admin_list()
     {
-        $visitors = Visitor::whereNull('deleted_at')->get();
+        $visitors = Visitor::whereNull('deleted_at')
+            ->orderBy('id', 'desc')
+            ->get();
         return view('visitor.admin_list', compact('visitors'));
     }
 
@@ -668,8 +687,8 @@ class VisitorController extends Controller
 
         $idPhotoPath = $visitor->id_photo ? asset("assets/visitor_photos/{$visitor->id_photo}") : asset('images/default-id.png');
         $photoPath = $visitor->photo ? asset("assets/visitor_photos/{$visitor->photo}") : asset('images/default-user.png');
-
-        return view('visitor.admin_visitor_show', compact('visitor', 'idPhotoPath', 'photoPath'));
+        $countries = Countries::getCountries();
+        return view('visitor.admin_visitor_show', compact('visitor', 'idPhotoPath', 'photoPath', 'countries'));
     }
 
     /**

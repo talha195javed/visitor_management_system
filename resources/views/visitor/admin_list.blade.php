@@ -59,6 +59,7 @@
                         <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
                             <thead>
                             <tr>
+                                <th>Id</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Identification Number</th>
@@ -71,10 +72,20 @@
                             <!-- Loop through visitors (PHP) -->
                             @foreach($visitors as $visitor)
                             <tr class="animated fadeInUp">
+                                <td>{{ $visitor->id }}</td>
                                 <td>{{ $visitor->full_name }}</td>
-                                <td>{{ $visitor->email }}</td>
-                                <td>{{ $visitor->identification_number }}</td>
-                                <td>{{ $visitor->phone }}</td>
+                                <td>@if($visitor->email)
+                                    <a href="mailto:{{ $visitor->email }}">{{ $visitor->email }}</a>
+                                    @else
+                                    <span class="text-muted">N/A</span>
+                                    @endif</td>
+                                <td>@if($visitor->identification_number)
+                                    <span>{{ $visitor->identification_number }}</span>
+                                    @else
+                                    <span class="text-muted">N/A</span>
+                                    @endif</td>
+                                <td>@if($visitor->country_code)
+                                    +{{ $visitor->country_code }}-@endif{{ $visitor->phone }}</td>
                                 <td>
                                             <span class="badge {{ $visitor->check_out_time == '' && $visitor->check_in_time == '' ? 'bg-primary' :
         ($visitor->check_out_time == '' ? 'bg-success' : 'bg-warning') }}">
@@ -131,15 +142,22 @@
             "info": true,
             "autoWidth": false,
             "responsive": true,
+            "order": [[0, "desc"]], // Sort by hidden ID column (desc)
             "columnDefs": [
                 {
-                    "targets": [5],
+                    "targets": 0, // ID column
+                    "visible": false,
+                    "searchable": false
+                },
+                {
+                    "targets": 6, // Actions column (updated index since ID was added)
                     "visible": true,
                     "responsivePriority": 1
                 }
             ]
         });
     });
+
 
     $(document).ready(function () {
         $('.archive-btn').on('click', function (e) {

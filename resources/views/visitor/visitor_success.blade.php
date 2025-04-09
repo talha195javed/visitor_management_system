@@ -24,39 +24,17 @@
     </div>
 </div>
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/visitor_success.css') }}">
 <style>
-    body {
-        background: linear-gradient(135deg, #74EBD5 0%, #9FACE6 100%);
-        font-family: 'Poppins', sans-serif;
-        color: #333;
-    }
-    .card {
-        background: #ffffff;
-        border: none;
-    }
-    .btn-primary {
-        background: linear-gradient(135deg, #36D1DC 0%, #5B86E5 100%);
-        border: none;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #5B86E5 0%, #36D1DC 100%);
-        transform: translateY(-2px);
-        transition: 0.3s;
-    }
     .mainScreen {
         background: url('{{ asset('assets/visitor_photos/remaining_screen_image.jpg') }}') no-repeat center center;
         background-size: cover;
     }
-    .navbar-hidden {
-        display: none !important;
-    }
-    .receipt {
-        border: 2px dashed #5B86E5;
-        text-align: center;
-    }
 </style>
+@endpush
 
+@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     Swal.fire({
@@ -73,4 +51,6 @@
         window.location.href = "{{ route('visitor.home') }}";
     }, 20000);
 </script>
+
+@endpush
 @endsection

@@ -57,7 +57,13 @@
 
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Email</div>
-                                    <div class="col-lg-9 col-md-8">{{ $visitor->email }}</div>
+                                    <div class="col-lg-9 col-md-8">
+                                        @if($visitor->email)
+                                        <a href="mailto:{{ $visitor->email }}">{{ $visitor->email }}</a>
+                                        @else
+                                        <span class="text-muted">N/A</span>
+                                        @endif
+                                    </div>
                                 </div>
 
                                 <div class="row">
@@ -67,7 +73,7 @@
 
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Contact #</div>
-                                    <div class="col-lg-9 col-md-8">{{ $visitor->phone ?? 'N/A' }}</div>
+                                    <div class="col-lg-9 col-md-8">+ {{ $visitor->country_code}} {{ $visitor->phone ?? 'N/A' }}</div>
                                 </div>
 
                                 <div class="row">
@@ -127,8 +133,17 @@
                                     <!-- Step 4: Phone -->
                                     <label for="phone" class="col-md-4 col-lg-3 col-form-label">Phone</label>
                                     <div id="phoneField" class="form-group d-flex align-items-center mb-3">
+                                        <select name="country_code" class="form-control" style="width: 11% !important;">
+                                            @foreach($countries as $country_code)
+                                            <option value="{{ $country_code['calling_code'] }}"
+                                                    @if(old('country_code', $visitor->country_code) == $country_code['calling_code'] || ($visitor->country_code == null && $country_code['calling_code'] == 971)) selected @endif>
+                                            (+{{ $country_code['calling_code'] }}) {{ $country_code['name'] }}
+                                            </option>
+                                            @endforeach
+                                        </select>
                                         <input type="text" class="form-control" name="phone" id="phone" value="{{ old('phone', $visitor->phone) }}" placeholder="Phone">
                                     </div>
+
 
                                     <!-- Step 5: ID Type -->
                                     <label for="id_type" class="col-md-4 col-lg-3 col-form-label">ID Type</label>

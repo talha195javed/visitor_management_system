@@ -1,7 +1,8 @@
 @extends('layouts.front_app')
 
 @section('content')
-<div id="mainScreen" class="container-fluid d-flex flex-column flex-md-row justify-content-center align-items-center vh-100 ps-0">
+<div id="mainScreen"
+     class="container-fluid d-flex flex-column flex-md-row justify-content-center align-items-center vh-100 ps-0">
     <div class="card p-4 shadow-lg rounded-4 border-0" style="max-width: 400px; background: #fff; transition: 0.3s;">
 
         <!-- Title -->
@@ -36,46 +37,7 @@
         </form>
     </div>
 </div>
-
-<!-- Custom CSS for Animation -->
-<style>
-    body {
-        background: linear-gradient(to right, #4facfe, #00f2fe);
-        font-family: 'Poppins', sans-serif;
-    }
-
-    .card {
-        animation: fadeInUp 0.8s ease-in-out;
-    }
-
-    .role-btn {
-        font-size: 18px;
-        font-weight: 600;
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s;
-    }
-
-    .role-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.15);
-    }
-
-    .role-btn:active {
-        transform: translateY(1px);
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    #mainScreen {
-        background: url('{{ asset('assets/visitor_photos/remaining_screen_image.jpg') }}') no-repeat center center;
-        background-size: cover;
-        position: relative;
-        color: #fff;
-    }
-    .navbar-hidden {
-        display: none !important; /* Hide the navbar */
-    }
-</style>
+@push('styles')
+<link rel="stylesheet" href="{{ asset('/css/select_role.css') }}">
+@endpush
 @endsection

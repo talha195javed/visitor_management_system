@@ -1,0 +1,92 @@
+body {
+     font-family: 'Poppins', sans-serif;
+ }
+
+.navbar {
+    background-color: #0d6efd;
+}
+
+.navbar a {
+    color: #fff;
+}
+
+.navbar a:hover {
+    color: #dcdcdc;
+}
+
+.container-fluid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.col-md-6 {
+    flex: 1;
+    padding: 0;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #4F46E5, #9333EA);
+    color: white;
+    padding: 30px;
+    text-align: center;
+    height: 100%;
+}
+
+.enter-button {
+    border-radius: 50px;
+    padding: 12px 40px;
+    font-size: 18px;
+    background-color: #fff;
+    color: #9333EA;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.enter-button:hover {
+    background-color: #9333EA;
+    color: #fff;
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+}
+
+.check-in-out-card {
+    background-color: #f8f9fa;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    text-align: center;
+}
+
+.check-in-out-card h2 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.check-in-out-btn {
+    border-radius: 50px;
+    font-weight: 600;
+    padding: 15px 40px;
+    font-size: 18px;
+}
+
+.check-in-btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.check-out-btn {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+#mainScreen {
+    background: url('../assets/visitor_photos/remaining_screen_image.jpg') no-repeat center center;
+    background-size: cover;
+    position: relative;
+    color: #fff;
+}
+
+.navbar-hidden {
+    display: none !important; /* Hide the navbar */
+}

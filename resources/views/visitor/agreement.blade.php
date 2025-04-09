@@ -34,34 +34,17 @@
     <div class="col-md-3">
     </div>
 </div>
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/agreement.css') }}">
 <style>
-    body {
-        background: linear-gradient(to right, #c6dbed, #00f2fe);
-        font-family: 'Poppins', sans-serif;
-    }
-    .bg-custom-gradient {
-        background: linear-gradient(135deg, #f06, #48c6ef, #6f86d6) !important;
-    }
-    .text-white { color: white !important; }
-    .form-check-input {
-        transform: scale(1.2);
-    }
-    .btn-primary {
-        background: linear-gradient(135deg, #f06, #48c6ef);
-        border: none;
-    }
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #e60578, #36b3ef);
-        transform: scale(1.05);
-    }
     .mainScreen {
         background: url('{{ asset('assets/visitor_photos/remaining_screen_image.jpg') }}') no-repeat center center;
         background-size: cover;
     }
-    .navbar-hidden {
-        display: none !important; /* Hide the navbar */
-    }
 </style>
+@endpush
+
+@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -82,4 +65,5 @@
         });
     });
 </script>
+@endpush
 @endsection

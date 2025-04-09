@@ -1014,7 +1014,7 @@ h6 {
 # Profie Page
 --------------------------------------------------------------*/
 .profile .profile-card img {
-  max-width: 120px;
+  /*max-width: 120px;*/
 }
 
 .profile .profile-card h2 {
@@ -1061,7 +1061,7 @@ h6 {
 }
 
 .profile .profile-edit img {
-  max-width: 120px;
+  /*max-width: 120px;*/
 }
 
 /*--------------------------------------------------------------

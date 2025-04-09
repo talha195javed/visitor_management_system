@@ -11,7 +11,7 @@
         <input type="text" id="visitorNameSearch" class="form-control mb-2" placeholder="Enter Visitor Name" autocomplete="off">
 
         <!-- Dropdown for Search Results -->
-        <div id="searchResults" class="list-group position-absolute w-50 mx-auto"></div>
+        <div id="searchResults" class="list-group position-absolute mx-auto"></div>
 
         <!-- Hidden Form -->
         <form id="checkoutForm">
@@ -50,14 +50,14 @@
                         // Add table headings
                         let heading = document.createElement("div");
                         heading.classList.add("list-group-item", "active");
-                        heading.innerHTML = `<strong>Visitor ID</strong> | <strong>Visitor Name</strong>`;
+                        heading.innerHTML = `<strong>Visitor ID</strong> | <strong>Visitor Name</strong> | <strong>CheckIn Time</strong>`;
                         searchResults.appendChild(heading);
 
                         data.forEach(visitor => {
                             let item = document.createElement("a");
                             item.href = "#";
                             item.classList.add("list-group-item", "list-group-item-action");
-                            item.innerHTML = `<strong>${visitor.id}</strong> | ${visitor.full_name}`;
+                            item.innerHTML = `<strong>${visitor.id}</strong> | ${visitor.full_name} | ${visitor.check_in_time}`;
                             item.dataset.id = visitor.id;
 
                             item.addEventListener("click", function(e) {
@@ -104,6 +104,56 @@
     });
 </script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // ...your existing code...
+
+        const checkoutForm = document.getElementById("checkoutForm");
+
+        checkoutForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(checkoutForm);
+
+            fetch("{{ route('visitor.checkout') }}", {
+                method: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: "Checked Out Successfully!",
+                            text: "Thank you for visiting. We hope to see you again soon!",
+                            confirmButtonText: 'Go Home'
+                        }).then(() => {
+                            window.location.href = "{{ route('visitor.home') }}";
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message || 'An error occurred.'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Checkout error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Something went wrong. Please try again.'
+                    });
+                });
+        });
+    });
+</script>
+
+
 <!-- Styling -->
 <style>
     #searchResults {
@@ -114,9 +164,6 @@
     .mainScreen {
         background: url('{{ asset('assets/visitor_photos/remaining_screen_image.jpg') }}') no-repeat center center;
         background-size: cover;
-    }
-    .navbar-hidden {
-        display: none !important; /* Hide the navbar */
     }
 </style>
 

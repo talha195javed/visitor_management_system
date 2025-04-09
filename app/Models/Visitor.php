@@ -22,6 +22,7 @@ class Visitor extends Model
         'role',
         'id_photo',
         'id_type',
+        'country_code',
     ];
 
     protected $dates = ['deleted_at']; // This is optional in Laravel 11+

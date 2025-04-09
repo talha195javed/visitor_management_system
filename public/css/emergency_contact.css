@@ -1,0 +1,9 @@
+body {
+    background: linear-gradient(to right, #c6dbed, #00f2fe);
+    font-family: 'Poppins', sans-serif;
+}
+.bg-custom-gradient { background: linear-gradient(135deg, #f06, #48c6ef, #6f86d6); }
+.hidden { display: none; }
+.fade-in { animation: fadeIn 0.8s ease-in-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+

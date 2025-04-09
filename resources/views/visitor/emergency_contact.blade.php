@@ -40,43 +40,7 @@
 @endif
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const instructionText = document.getElementById("instructionText");
-        const instructionMessages = {
-            emergency_name: "Enter the name of the emergency contact and press the tick ✔",
-            emergency_phone: "Enter the emergency contact's phone number and press the tick ✔",
-            emergency_relation: "Enter the relation of the emergency contact to the visitor and press the tick ✔"
-        };
-
-        document.querySelectorAll("input").forEach(input => {
-            input.addEventListener("focus", function () {
-                if (instructionMessages[this.id]) {
-                    instructionText.textContent = instructionMessages[this.id];
-                }
-            });
-        });
-    });
-</script>
-
-<style>
-    body {
-        background: linear-gradient(to right, #c6dbed, #00f2fe);
-        font-family: 'Poppins', sans-serif;
-    }
-    .bg-custom-gradient { background: linear-gradient(135deg, #f06, #48c6ef, #6f86d6); }
-    .hidden { display: none; }
-    .fade-in { animation: fadeIn 0.8s ease-in-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-    #mainScreen {
-        background: url('{{ asset('assets/visitor_photos/remaining_screen_image.jpg') }}') no-repeat center center;
-        background-size: cover;
-        position: relative;
-        color: #fff;
-    }
-    .navbar-hidden {
-        display: none !important; /* Hide the navbar */
-    }
-</style>
+    @push('styles')
+<link rel="stylesheet" href="{{ asset('css/emergency_contact.css') }}">
+    @endpush
 @endsection

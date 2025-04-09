@@ -1,0 +1,124 @@
+/* Fullscreen container with dark theme background and gradient overlay */
+
+
+/* Gradient Overlay for darker background */
+.background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4)); /* Gradient for a smoother dark effect */
+    z-index: -1;
+}
+
+/* Left Side - Buttons Section */
+.left-side {
+    text-align: center;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.left-side h2 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.left-side .btn {
+    color: #fff;
+    border: 1px solid #fff;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.left-side .btn:hover {
+    background-color: #ffcc00; /* Hover background color */
+    color: #000;
+    transform: scale(1.05); /* Scale up effect */
+    box-shadow: 0 4px 20px rgba(255, 204, 0, 0.5); /* Glowing effect */
+}
+
+/* Right Side - Scanner Section */
+.right-side {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.scanner-container {
+    position: relative;
+    display: inline-block;
+}
+
+.scanner-img {
+    width: 80%; /* Make sure it fits well */
+    max-width: 400px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 10px;
+}
+
+.scanner-img:hover {
+    transform: scale(1.1); /* Slight zoom effect */
+    box-shadow: 0 0 30px rgba(255, 204, 0, 0.7); /* Glowing effect around the scanner */
+}
+
+.text-muted {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .left-side h2 {
+        font-size: 1.5rem;
+    }
+
+    .scanner-img {
+        width: 90%; /* Adjust width for smaller screens */
+        max-width: 300px;
+    }
+
+    .check-in-btn, .check-out-btn {
+        font-size: 1.1rem; /* Adjust font size for smaller screens */
+    }
+}
+
+
+/* Optional Dark Overlay */
+.welcome-screen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay for better contrast */
+    z-index: -1;
+}
+
+.enter-button {
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    background-color: #ffcc00;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.hidden {
+    opacity: 0;
+    transform: translateY(-100%);
+    pointer-events: none;
+}
+
+.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.enter-button:hover {
+    background-color: #28a745; /* Set the background color to the green shade */
+    color: #fff; /* Change the text color to white */
+    transform: scale(1.05); /* Scale up effect */
+    box-shadow: 0 4px 20px rgba(40, 167, 69, 0.5); /* Glowing effect around the button */
+}

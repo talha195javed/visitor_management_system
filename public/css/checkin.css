@@ -1,0 +1,89 @@
+body {
+    font-family: 'Poppins', sans-serif;
+}
+.container-fluid {
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black overlay */
+}
+.bg-dark {
+    background-color: rgba(0, 0, 0, 0.7); /* Dark background for form */
+}
+.form-control {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: 1px solid #444;
+    transition: all 0.3s ease;
+    padding: 1rem; /* Increased padding */
+}
+.form-control:focus {
+    border-color: #00f2fe;
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.8);
+}
+.btn-light {
+    background-color: #48c6ef;
+    border-color: #48c6ef;
+    transition: all 0.3s ease;
+}
+.btn-light:hover {
+    background-color: #6f86d6;
+    border-color: #6f86d6;
+}
+.form-control-lg {
+    font-size: 1.1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+}
+.btn-lg {
+    font-size: 1.2rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+}
+.shadow-lg {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+.col-md-8, .col-lg-6 {
+    max-width: 600px; /* Wider form */
+}
+
+.visitor-btn {
+    font-size: 1.25rem;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 2px solid transparent;
+    backdrop-filter: blur(10px);
+    font-weight: 600;
+    display: inline-block;
+    width: 100%;
+    max-width: 300px; /* Ensures a nice width */
+}
+
+/* Pre-Registered Style */
+.btn-pre {
+    background: linear-gradient(135deg, #00f2fe, #4facfe);
+    color: #fff;
+    border-color: #00f2fe;
+}
+.btn-pre:hover {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.8);
+}
+
+/* New Visitor Style */
+.btn-new {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: #fff;
+    border-color: #f093fb;
+}
+.btn-new:hover {
+    background: linear-gradient(135deg, #f5576c, #f093fb);
+    box-shadow: 0 0 20px rgba(240, 147, 251, 0.8);
+}
+
+/* Center Buttons with Better Spacing */
+#visitorTypeSelection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Space between buttons */
+}
