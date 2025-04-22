@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VisitorController;
+use App\Models\CustomerData;
 
 Route::get('/test', function () {
     return response()->json(['message' => 'API is working!']);
@@ -45,4 +46,40 @@ Route::get('/visitor/search', function (Request $request) {
         : Visitor::where('full_name', 'LIKE', "%{$query}%")->get();
 
     return response()->json($visitors);
+});
+
+Route::post('/contact/submit', function(Request $request) {
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'nullable|string|max:20',
+        'company' => 'nullable|string|max:255',
+        'message' => 'required|string',
+    ]);
+
+    try {
+        $contact = CustomerData::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'company' => $validated['company'] ?? null,
+            'message' => $validated['message'],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Thank you for your message! We will get back to you soon.',
+            'data' => $contact
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Contact form submission failed: ' . $e->getMessage());
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to submit your message. Please try again later.'
+        ], 500);
+    }
 });
