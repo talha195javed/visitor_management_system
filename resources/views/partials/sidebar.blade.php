@@ -40,6 +40,7 @@
             </ul>
 
         </li>
+        @if(auth()->user() && (auth()->user()->role == 'admin' || auth()->user()->role == 'manager' || auth()->user()->role == 'superAdmin'))
         <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#employees-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-menu-button-wide"></i><span>Employees</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -57,6 +58,8 @@
                 </li>
             </ul>
         </li>
+        @endif
+        @if(auth()->user() && (auth()->user()->role == 'admin' || auth()->user()->role == 'superAdmin'))
         <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#admin-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-menu-button-wide"></i><span>Admin</span><i class="bi bi-chevron-down ms-auto"></i>
@@ -84,6 +87,7 @@
                 </li>
             </ul>
         </li>
+        @endif
 
 
         <li class="nav-item">

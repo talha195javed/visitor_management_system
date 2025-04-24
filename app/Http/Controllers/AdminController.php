@@ -40,6 +40,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|string|max:255',
         ]);
 
         // Create new user
@@ -47,6 +48,7 @@ class AdminController extends Controller
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
+            'role' => $validatedData['role'],
         ]);
 
         // Redirect with success message
@@ -60,6 +62,7 @@ class AdminController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'role' => 'required|string|max:255',
         ]);
 
         if ($request->name !== $user->name) {
@@ -72,6 +75,10 @@ class AdminController extends Controller
 
         if ($request->filled('password')) {
             $user->password = Hash::make($validatedData['password']);
+        }
+
+        if ($request->role !== $user->role) {
+            $user->role = $validatedData['role'];
         }
 
         $user->save();

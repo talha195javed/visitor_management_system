@@ -57,6 +57,16 @@
                                                class="form-control" required>
                                     </div>
 
+                                    <div class="form-group">
+                                        <label for="role">Role</label>
+                                        <select id="role" name="role" class="form-control" required>
+                                            <option value="">Select Role</option>
+                                            <option value="admin">Super Admin</option>
+                                            <option value="manager">Manager</option>
+                                            <option value="employee">Employee</option>
+                                        </select>
+                                    </div>
+
                                     <button type="submit" class="btn btn-primary">Create User</button>
                                 </form>
                             </div>

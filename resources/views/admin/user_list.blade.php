@@ -32,6 +32,7 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Role</th>
                                 <th>Actions</th>
                             </tr>
                             </thead>
@@ -41,6 +42,12 @@
                             <tr class="animated fadeInUp">
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
+                                <td>
+                                    @if($user->role == 'superAdmin') Super Admin
+                                    @elseif($user->role == 'admin') Admin
+                                    @elseif ($user->role == 'manager') Manager
+                                    @else Employee
+                                    @endif</td>
                                 <td style="width: 10% !important;">
                                     <a href="{{ route('admin.users.user_show', $user->id) }}" class="btn btn-primary btn-sm btn-hover">
                                         <i class="fas fa-eye"></i>

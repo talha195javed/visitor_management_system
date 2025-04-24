@@ -22,32 +22,6 @@
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="">
-                <!-- Accordion for visitor filter -->
-                <!--<div class="accordion" id="visitorFilterAccordion">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse">
-                                Filter Visitors
-                            </button>
-                        </h2>
-                        <div id="filterCollapse" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#visitorFilterAccordion">
-                            <div class="accordion-body">
-                                <form method="GET" action="#">
-                                    <div class="mb-3">
-                                        <label for="status" class="form-label">Status</label>
-                                        <select class="form-select" id="status" name="status">
-                                            <option value="">All</option>
-                                            <option value="checked_in">Checked In</option>
-                                            <option value="checked_out">Checked Out</option>
-                                        </select>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Apply Filter</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>-->
-
                 <div class="card animated fadeInUp">
                     <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
                         <h3 class="m-0">Visitor List</h3>
@@ -106,7 +80,7 @@
 
                                     <!-- Archive Button -->
                                     <form action="{{ route('visitors.archive', $visitor->id) }}" method="POST" class="d-inline-block archive-form">
-                                    @csrf
+                                        @csrf
                                         <button type="button" class="btn btn-danger btn-sm btn-hover archive-btn">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -132,7 +106,6 @@
 
 <!-- Initialize DataTable -->
 <script>
-
     $(document).ready(function() {
         $('#example').DataTable({
             "paging": true,
@@ -142,7 +115,7 @@
             "info": true,
             "autoWidth": false,
             "responsive": true,
-            "order": [[0, "desc"]], // Sort by hidden ID column (desc)
+            "order": [[0, "desc"]], // Sort by ID column in descending order (newest first)
             "columnDefs": [
                 {
                     "targets": 0, // ID column
@@ -150,14 +123,13 @@
                     "searchable": false
                 },
                 {
-                    "targets": 6, // Actions column (updated index since ID was added)
+                    "targets": 6, // Actions column
                     "visible": true,
                     "responsivePriority": 1
                 }
             ]
         });
     });
-
 
     $(document).ready(function () {
         $('.archive-btn').on('click', function (e) {
@@ -180,8 +152,6 @@
             });
         });
     });
-
 </script>
 
 @endsection
-

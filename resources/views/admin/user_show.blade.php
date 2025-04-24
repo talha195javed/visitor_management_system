@@ -58,6 +58,11 @@
                                     <div class="col-lg-9 col-md-8">{{ $user->email }}</div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Role</div>
+                                    <div class="col-lg-9 col-md-8">{{ ucfirst($user->role) }}</div>
+                                </div>
+
                             </div>
 
                             <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
@@ -74,21 +79,36 @@
                                     <!-- Step 2: Email -->
                                     <label for="email" class="col-md-4 col-lg-3 col-form-label">Email</label>
                                     <div id="emailField" class="form-group d-flex align-items-center mb-3">
-                                        <input type="email" class="form-control" name="email" id="email" value="{{ old('email', $user->email) }}" placeholder="Email">
+                                        <input type="email" class="form-control" name="email" id="email" value="{{ old('email', $user->email) }}" placeholder="Email" @if($user->role == 'superAdmin' && auth()->user()->role != 'superAdmin') readonly @endif>
                                     </div>
 
-                                    <!-- Step 3: Position -->
+
+                                    <!-- Step 3: Password -->
                                     <label for="password" class="col-md-4 col-lg-3 col-form-label">Password</label>
                                     <div id="passwordField" class="form-group d-flex align-items-center mb-3">
-                                        <input type="password" class="form-control" name="password" id="password" value="" placeholder="New Password (if Required)">
+                                        <input type="password" class="form-control" name="password" id="password" value="" placeholder="New Password (if Required)" @if($user->role == 'superAdmin' && auth()->user()->role != 'superAdmin') readonly @endif>
                                     </div>
 
-                                    <!-- Step 4: Phone -->
+                                    <!-- Step 4: Confirm Password -->
                                     <label for="password_confirmation" class="col-md-4 col-lg-3 col-form-label">Confirm Password</label>
                                     <div id="passwordConfirmationField" class="form-group d-flex align-items-center mb-3">
-                                        <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" value="" placeholder="Confirm Password ">
+                                        <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" value="" placeholder="Confirm Password " @if($user->role == 'superAdmin' && auth()->user()->role != 'superAdmin') readonly @endif>
                                     </div>
 
+                                    @if ($user->role == 'superAdmin')
+                                    <select class="form-control" name="role" id="role" hidden>
+                                        <option value="superAdmin" {{ $user->role == 'superAdmin' ? 'selected' : '' }}>Super Admin</option>
+                                    </select>
+                                    @elseif ($user->role != 'superAdmin')
+                                    <label for="role" class="col-md-4 col-lg-3 col-form-label">Role</label>
+                                    <div id="roleField" class="form-group d-flex align-items-center mb-3">
+                                        <select class="form-control" name="role" id="role">
+                                            <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
+                                            <option value="manager" {{ $user->role == 'manager' ? 'selected' : '' }}>Manager</option>
+                                            <option value="employee" {{ $user->role == 'employee' ? 'selected' : '' }}>Employee</option>
+                                        </select>
+                                    </div>
+                                    @endif
                                     <div class="text-center">
                                         <button type="submit" class="btn btn-primary">Save Changes</button>
                                     </div>
