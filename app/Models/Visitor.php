@@ -11,6 +11,7 @@ class Visitor extends Model
     use HasFactory, SoftDeletes; // Combine trait usage
 
     protected $fillable = [
+        'client_id',
         'full_name',
         'company',
         'email',

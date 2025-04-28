@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CompanyInfoController;
+use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
@@ -124,4 +125,13 @@ Route::post('/admin/field-visibility/update', [FieldSettingController::class, 'u
 Route::get('/visitor/search', [VisitorController::class, 'search_visitor'])->name('visitor.search');
 
 Route::post('/company-info/upload', [CompanyInfoController::class, 'uploadImages'])->name('company_info.upload');
+
+Route::get('/subscriptions/index', [SubscriptionController::class, 'index'])
+    ->name('admin.subscriptions.index');
+Route::get('/subscriptions/{id}', [SubscriptionController::class, 'show'])->name('admin.subscriptions.show');
+
+
+Route::get('/subscriptions/{id}/edit', [SubscriptionController::class, 'edit'])->name('admin.subscriptions.edit');
+Route::put('/subscriptions/{id}', [SubscriptionController::class, 'update'])->name('admin.subscriptions.update');
+Route::delete('/subscriptions/{id}', [SubscriptionController::class, 'destroy'])->name('admin.subscriptions.destroy');
 

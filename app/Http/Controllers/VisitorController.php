@@ -86,6 +86,7 @@ class VisitorController extends Controller
         $visitor->country_code = $request->country_code;
         $visitor->id_type = $request->id_type;
         $visitor->identification_number = $request->identification_number;
+        $visitor->client_id = $request->client_id;
         $visitor->pre_register = 1;
         $visitor->save();
 
@@ -108,6 +109,7 @@ class VisitorController extends Controller
                 'phone' => $validated['phone'],
                 'id_type' => $validated['id_type'],
                 'identification_number' => $validated['identification_number'],
+                'client_id' => $validated['client_id'],
             ]);
 
             return response()->json(['success' => true]);
@@ -142,6 +144,9 @@ class VisitorController extends Controller
                 } if(isset($request->identification_number)) {
                     $visitor->identification_number = $request->identification_number;
                 }
+                if(isset($request->client_id)) {
+                    $visitor->client_id = $request->client_id;
+                }
                 $visitor->check_in_time = now();
                 $visitor->pre_register = 0;
                 $visitor->save();
@@ -159,6 +164,9 @@ class VisitorController extends Controller
                     $visitor->id_type = $request->id_type;
                 } if(isset($request->identification_number)) {
                     $visitor->identification_number = $request->identification_number;
+                }
+                if(isset($request->client_id)) {
+                    $visitor->client_id = $request->client_id;
                 }
                 $visitor->check_in_time = now();
                 $visitor->pre_register = 0;
@@ -178,6 +186,9 @@ class VisitorController extends Controller
                     $visitor->id_type = $request->id_type;
                 } if(isset($request->identification_number)) {
                     $visitor->identification_number = $request->identification_number;
+                }
+                if(isset($request->client_id)) {
+                    $visitor->client_id = $request->client_id;
                 }
                 $visitor->check_in_time = now();
                 $visitor->pre_register = 0;
@@ -289,6 +300,7 @@ class VisitorController extends Controller
             'phone' => $request->phone,
             'country_code' => $request->country_code,
             'identification_number' => $request->identification_number,
+            'client_id' => $request->client_id,
             'id_type' => $request->id_type,
             'check_in_time' => null, // Pre-registered visitor hasn't checked in yet
             'check_out_time' => null,

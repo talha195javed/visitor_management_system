@@ -79,6 +79,7 @@ class EmployeeController extends Controller
         $employee->email = $request->email;
         $employee->contact_number = $request->contact_number;
         $employee->position = $request->position;
+        $employee->client_id = $request->client_id;
         $employee->save();
 
         return response()->json(['success' => true]);
@@ -118,6 +119,7 @@ class EmployeeController extends Controller
                     'email' => $validated['email'],
                     'contact_number' => $validated['contact_number'],
                     'position' => $validated['position'],
+                    'client_id' => $validated['client_id'],
                 ]);
                 return response()->json(['success' => true]);
             } else {

@@ -105,10 +105,30 @@
                                         <select class="form-control" name="role" id="role">
                                             <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
                                             <option value="manager" {{ $user->role == 'manager' ? 'selected' : '' }}>Manager</option>
-                                            <option value="employee" {{ $user->role == 'employee' ? 'selected' : '' }}>Employee</option>
+                                            <option value="employee" {{ $user->role == 'client' ? 'selected' : '' }}>Client</option>
                                         </select>
                                     </div>
                                     @endif
+                                    <div id="edit-package-fields" style="{{ $user->role === 'client' ? '' : 'display:none;' }}">
+                                        <label class="col-md-4 col-lg-3 col-form-label">Package Start</label>
+                                        <div class="form-group d-flex align-items-center mb-3">
+                                            <input type="date" class="form-control" name="package_start_date" value="{{ old('package_start_date', $user->package_start_date) }}">
+                                        </div>
+
+                                        <label class="col-md-4 col-lg-3 col-form-label">Package End</label>
+                                        <div class="form-group d-flex align-items-center mb-3">
+                                            <input type="date" class="form-control" name="package_end_date" value="{{ old('package_end_date', $user->package_end_date) }}">
+                                        </div>
+
+                                        <label class="col-md-4 col-lg-3 col-form-label">Package Type</label>
+                                        <div class="form-group d-flex align-items-center mb-3">
+                                            <select class="form-control" name="package_type">
+                                                <option value="basic" {{ $user->package_type == 'basic' ? 'selected' : '' }}>Basic</option>
+                                                <option value="professional" {{ $user->package_type == 'professional' ? 'selected' : '' }}>Professional</option>
+                                                <option value="enterprise" {{ $user->package_type == 'enterprise' ? 'selected' : '' }}>Enterprise</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="text-center">
                                         <button type="submit" class="btn btn-primary">Save Changes</button>
                                     </div>
@@ -194,8 +214,15 @@
                 });
             });
         });
-
-
+        $(document).ready(function () {
+            $('#role').on('change', function () {
+                if ($(this).val() === 'client') {
+                    $('#edit-package-fields').slideDown();
+                } else {
+                    $('#edit-package-fields').slideUp();
+                }
+            });
+        });
     </script>
 </main>
 

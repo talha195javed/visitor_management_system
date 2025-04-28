@@ -41,6 +41,9 @@ class AdminController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|string|max:255',
+            'package_start_date' => 'nullable|date',
+            'package_end_date' => 'nullable|date',
+            'package_type' => 'nullable|string|max:255',
         ]);
 
         // Create new user
@@ -49,6 +52,9 @@ class AdminController extends Controller
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'role' => $validatedData['role'],
+            'package_start_date' => $validatedData['package_start_date'] ?? null,
+            'package_end_date' => $validatedData['package_end_date'] ?? null,
+            'package_type' => $validatedData['package_type'] ?? null,
         ]);
 
         // Redirect with success message
@@ -63,6 +69,9 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'role' => 'required|string|max:255',
+            'package_start_date' => 'nullable|date',
+            'package_end_date' => 'nullable|date',
+            'package_type' => 'nullable|string|max:255',
         ]);
 
         if ($request->name !== $user->name) {
@@ -79,6 +88,15 @@ class AdminController extends Controller
 
         if ($request->role !== $user->role) {
             $user->role = $validatedData['role'];
+        }
+        if ($request->package_start_date !== $user->package_start_date) {
+            $user->package_start_date = $validatedData['package_start_date'] ?? null;
+        }
+        if ($request->package_end_date !== $user->package_end_date) {
+            $user->package_end_date = $validatedData['package_end_date'] ?? null;
+        }
+        if ($request->package_type !== $user->package_type) {
+            $user->package_type = $validatedData['package_type'] ?? null;
         }
 
         $user->save();
