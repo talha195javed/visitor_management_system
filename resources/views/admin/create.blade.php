@@ -47,8 +47,7 @@
 
                                     <div class="form-group">
                                         <label for="password">Password</label>
-                                        <input type="password" id="password" name="password" class="form-control"
-                                               required>
+                                        <input type="password" id="password" name="password" class="form-control" required>
                                     </div>
 
                                     <div class="form-group">
@@ -63,11 +62,34 @@
                                             <option value="">Select Role</option>
                                             <option value="admin">Super Admin</option>
                                             <option value="manager">Manager</option>
-                                            <option value="employee">Employee</option>
+                                            <option value="client">Client</option>
                                         </select>
                                     </div>
 
-                                    <button type="submit" class="btn btn-primary">Create User</button>
+                                    {{-- These fields will only be visible when role = client --}}
+                                    <div id="package-fields" style="display: none;">
+                                        <div class="form-group">
+                                            <label for="package_start_date">Package Start Date</label>
+                                            <input type="date" id="package_start_date" name="package_start_date" class="form-control">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="package_end_date">Package End Date</label>
+                                            <input type="date" id="package_end_date" name="package_end_date" class="form-control">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="package_type">Package Type</label>
+                                            <select id="package_type" name="package_type" class="form-control">
+                                                <option value="">Select Package</option>
+                                                <option value="basic">Basic</option>
+                                                <option value="professional">Professional</option>
+                                                <option value="enterprise">Enterprise</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary mt-3">Create User</button>
                                 </form>
                             </div>
                         </div>
@@ -77,5 +99,23 @@
         </div>
     </section>
 </main>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const roleSelect = document.getElementById('role');
+        const packageFields = document.getElementById('package-fields');
+
+        function togglePackageFields() {
+            if (roleSelect.value === 'client') {
+                packageFields.style.display = 'block';
+            } else {
+                packageFields.style.display = 'none';
+            }
+        }
+
+        roleSelect.addEventListener('change', togglePackageFields);
+        togglePackageFields(); // Initialize on page load
+    });
+</script>
+
 @endsection
 

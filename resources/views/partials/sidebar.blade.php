@@ -87,7 +87,23 @@
                 </li>
             </ul>
         </li>
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#payments-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-credit-card"></i>
+                <span>Payments</span>
+                <i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="payments-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="{{ route('admin.subscriptions.index') }}">
+                        <i class="bi bi-circle"></i>
+                        <span>Subscriptions</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
         @endif
+
 
 
         <li class="nav-item">

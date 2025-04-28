@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VisitorController;
@@ -83,3 +84,84 @@ Route::post('/contact/submit', function(Request $request) {
         ], 500);
     }
 });
+
+
+Route::post('/create-payment-intent', function (Request $request) {
+    \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+
+    try {
+        $paymentIntent = \Stripe\PaymentIntent::create([
+            'amount' => $request->amount,
+            'currency' => $request->currency ?? 'aed',
+            'metadata' => [
+                'plan' => $request->plan,
+                'user_id' => auth()->id() ?? 'guest' // If you have authentication
+            ],
+        ]);
+
+        return response()->json([
+            'clientSecret' => $paymentIntent->client_secret
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
+
+Route::post('/save-customer-details', function(Request $request) {
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'required|string|max:20',
+        'package_type' => 'required|string|in:basic,professional,enterprise',
+        'duration' => 'required|string|in:monthly,yearly',
+        'payment_intent_id' => 'required|string',
+        'amount' => 'required|numeric',
+        'currency' => 'required|string|size:3',
+    ]);
+
+    try {
+        // Create a new customer subscription record
+        $subscription = \App\Models\CustomerSubscription::create([
+            'customer_name' => $validated['name'],
+            'customer_email' => $validated['email'],
+            'customer_phone' => $validated['phone'],
+            'package_type' => $validated['package_type'],
+            'billing_cycle' => $validated['duration'],
+            'payment_intent_id' => $validated['payment_intent_id'],
+            'amount' => $validated['amount'],
+            'currency' => $validated['currency'],
+            'status' => 'active',
+            'ip_address' => $request->ip(),
+            'start_date' => now(),
+            'end_date' => $validated['duration'] === 'yearly'
+                ? now()->addYear()
+                : now()->addMonth(),
+        ]);
+
+        // Send confirmation email (you'll need to implement this)
+        // Mail::to($validated['email'])->send(new SubscriptionConfirmation($subscription));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Customer details and subscription saved successfully',
+            'data' => $subscription
+        ]);
+
+    } catch (\Exception $e) {
+        \Log::error('Failed to save customer details: ' . $e->getMessage());
+        \Log::error($e->getTraceAsString());
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to save customer details. Please try again.',
+            'error' => env('APP_DEBUG') ? $e->getMessage() : null
+        ], 500);
+    }
+});
+
+Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
+Route::get('/subscriptions/data', [SubscriptionController::class, 'getSubscriptions'])->name('subscriptions.data');
+Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
