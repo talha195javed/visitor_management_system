@@ -1,7 +1,50 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    /* Custom Modal Styling */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
 
+    .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        border: none;
+    }
+
+    .image-container {
+        background-color: #f8f9fa;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+    }
+
+    .zoom-in-image {
+        transition: transform 0.3s ease;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .modal.show .zoom-in-image {
+        transform: scale(1.03);
+    }
+
+    .btn-close-white {
+        filter: invert(1) brightness(100%);
+    }
+
+    .pattern-dots-md {
+        background-image: radial-gradient(currentColor 1px, transparent 1px);
+        background-size: 12px 12px;
+        color: rgba(255, 255, 255, 0.3);
+        height: 100%;
+    }
+</style>
 <main id="main" class="main">
 
     <div class="pagetitle">
@@ -21,8 +64,9 @@
 
                 <div class="card">
                     <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-
-                        <img src="{{ $photoPath }}" alt="Profile">
+                        <!-- Add cursor-pointer class and data-bs-toggle/data-bs-target attributes -->
+                        <img src="{{ $photoPath }}" alt="Profile" class="cursor-pointer"
+                             data-bs-toggle="modal" data-bs-target="#imageModal" style="cursor: pointer;">
                         <h2>{{ $visitor->full_name }}</h2>
                     </div>
                 </div>
@@ -175,6 +219,49 @@
 
             </div>
         </div>
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 overflow-hidden">
+                    <!-- Modal Header with Gradient Background -->
+                    <div class="modal-header bg-gradient-primary text-white border-0 position-relative">
+                        <h5 class="modal-title font-weight-bold">{{ $visitor->full_name }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <!-- Decorative Elements -->
+                        <div class="position-absolute top-0 end-0 w-100 h-100 opacity-10">
+                            <div class="pattern-dots-md"></div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Body with Animated Image -->
+                    <div class="modal-body p-0 position-relative">
+                        <div class="image-container">
+                            <img src="{{ $photoPath }}" alt="Profile" class="img-fluid zoom-in-image"
+                                 style="max-height: 70vh; width: auto; display: block; margin: 0 auto;">
+                        </div>
+                        <!-- Floating Info Badge -->
+                        <div class="position-absolute bottom-0 start-0 m-3">
+                    <span class="badge bg-info shadow-sm">
+                        <i class="bi bi-person-badge me-1"></i> Visitor ID: {{ $visitor->id }}
+                    </span>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer with Action Buttons -->
+                    <div class="modal-footer bg-light border-0 d-flex justify-content-between">
+                        <div>
+                            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill">
+                                <i class="bi bi-download me-1"></i> Download
+                            </button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                                <i class="bi bi-x-lg me-1"></i> Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
     <script>
         $(document).ready(function() {
@@ -221,6 +308,26 @@
             });
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation class when modal opens
+            $('#imageModal').on('show.bs.modal', function () {
+                $('.zoom-in-image').css('transform', 'scale(0.95)');
+            });
+
+            $('#imageModal').on('shown.bs.modal', function () {
+                $('.zoom-in-image').css('transform', 'scale(1)');
+            });
+
+            // Download button functionality
+            $(document).on('click', '.btn-outline-primary', function() {
+                const link = document.createElement('a');
+                link.href = '{{ $photoPath }}';
+                link.download = 'visitor-{{ $visitor->id }}-profile.jpg';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        });
     </script>
 </main>
 

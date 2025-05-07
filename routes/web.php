@@ -108,6 +108,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/users_list', [AdminController::class, 'users_list'])->name('users.list');
 
+    Route::get('/clients_list', [AdminController::class, 'clients_list'])->name('clients.list');
+
     Route::get('/emails_list', [AdminController::class, 'emails_list'])->name('emails.list');
 
     Route::get('/user_show/{id}', [AdminController::class, 'user_show'])->name('users.user_show');

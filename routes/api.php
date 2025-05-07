@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\ClientController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VisitorController;
@@ -115,6 +115,7 @@ Route::post('/save-customer-details', function(Request $request) {
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'phone' => 'required|string|max:20',
+        'client_id' => 'required|string|max:20',
         'package_type' => 'required|string|in:basic,professional,enterprise',
         'duration' => 'required|string|in:monthly,yearly',
         'payment_intent_id' => 'required|string',
@@ -128,6 +129,7 @@ Route::post('/save-customer-details', function(Request $request) {
             'customer_name' => $validated['name'],
             'customer_email' => $validated['email'],
             'customer_phone' => $validated['phone'],
+            'client_id' => $validated['client_id'],
             'package_type' => $validated['package_type'],
             'billing_cycle' => $validated['duration'],
             'payment_intent_id' => $validated['payment_intent_id'],
@@ -162,6 +164,6 @@ Route::post('/save-customer-details', function(Request $request) {
     }
 });
 
-Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('subscriptions.index');
-Route::get('/subscriptions/data', [SubscriptionController::class, 'getSubscriptions'])->name('subscriptions.data');
-Route::get('/subscriptions/{subscription}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
+Route::post('/client/register', [ClientController::class, 'register']);
+Route::post('/client/login', [ClientController::class, 'login']);
+Route::middleware('auth:sanctum')->get('/user', [ClientController::class, 'getUser']);
