@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\MailLog;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -13,6 +14,12 @@ class AdminController extends Controller
     {
         $users = User::all();
         return view('admin.user_list', compact('users'));
+    }
+
+    public function clients_list()
+    {
+        $clients = Client::all();
+        return view('admin.client_list', compact('clients'));
     }
 
     public function emails_list()

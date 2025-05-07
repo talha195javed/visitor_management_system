@@ -1,266 +1,406 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Professional Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
-        /* Fonts Form Google Font ::- https://fonts.google.com/  -:: */
-        @import url("https://fonts.googleapis.com/css?family=Abel|Abril+Fatface|Alegreya|Arima+Madurai|Dancing+Script|Dosis|Merriweather|Oleo+Script|Overlock|PT+Serif|Pacifico|Playball|Playfair+Display|Share|Unica+One|Vibur");
-        /* End Fonts */
-        /* Start Global rules */
+        /* Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        /* Global Reset */
         * {
-            padding: 0;
             margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
-        /* End Global rules */
-
-        /* Start body rules */
         body {
-            background-image: linear-gradient(-225deg, #e3fdf5 0%, #ffe6fa 100%);
-            background-image: linear-gradient(to top, #a8edea 0%, #fed6e3 100%);
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-
-            font-family: "Vibur", cursive;
-            /*   the main font */
-            font-family: "Abel", sans-serif;
-            opacity: 0.95;
-            /* background-image: linear-gradient(to top, #d9afd9 0%, #97d9e1 100%); */
-        }
-
-        /* |||||||||||||||||||||||||||||||||||||||||||||*/
-        /* //////////////////////////////////////////// */
-
-        /* End body rules */
-
-        /* Start form  attributes */
-        form {
-            width: 450px;
-            min-height: 500px;
-            height: auto;
-            border-radius: 5px;
-            margin: 2% auto;
-            box-shadow: 0 9px 50px hsla(20, 67%, 75%, 0.31);
-            padding: 2%;
-            background-image: linear-gradient(-225deg, #e3fdf5 50%, #ffe6fa 50%);
-        }
-
-        /* form Container */
-        form .con {
-            display: -webkit-flex;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
             display: flex;
-
-            -webkit-justify-content: space-around;
-            justify-content: space-around;
-
-            -webkit-flex-wrap: wrap;
-            flex-wrap: wrap;
-
-            margin: 0 auto;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
         }
 
-        /* the header form form */
-        header {
-            margin: 2% auto 10% auto;
+        /* Main Container */
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            padding: 40px;
+            margin: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Header Section */
+        .login-header {
             text-align: center;
+            margin-bottom: 30px;
         }
 
-        /* Login title form form */
-        header h2 {
-            font-size: 250%;
-            font-family: "Playfair Display", serif;
-            color: #3e403f;
+        .login-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
         }
 
-        /*  A welcome message or an explanation of the login form */
-        header p {
-            letter-spacing: 0.05em;
+        .login-header p {
+            color: #7f8c8d;
+            font-size: 15px;
         }
 
-        /* //////////////////////////////////////////// */
-        /* //////////////////////////////////////////// */
-
-        .input-item {
-            background: #fff;
-            color: #333;
-            padding: 14.5px 0px 15px 9px;
-            border-radius: 5px 0px 0px 5px;
+        /* Logo */
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
         }
 
-        /* Show/hide password Font Icon */
-        #eye {
-            background: #fff;
-            color: #333;
-
-            margin: 5.9px 0 0 0;
-            margin-left: -20px;
-            padding: 15px 9px 19px 0px;
-            border-radius: 0px 5px 5px 0px;
-
-            float: right;
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
             position: relative;
-            right: 1%;
-            top: -0.2%;
-            z-index: 5;
-
-            cursor: pointer;
         }
 
-        /* inputs form  */
-        input[class="form-input"] {
-            width: 240px;
-            height: 50px;
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 14px;
+        }
 
-            margin-top: 2%;
-            padding: 15px;
+        .input-field {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
 
+        .input-field:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            background-color: white;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 40px;
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+
+        /* Password Toggle */
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 40px;
+            cursor: pointer;
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+
+        /* Remember Me & Forgot Password */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-me input {
+            margin-right: 8px;
+        }
+
+        .forgot-password a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .forgot-password a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            border: none;
+            border-radius: 8px;
+            color: white;
             font-size: 16px;
-            font-family: "Abel", sans-serif;
-            color: #5e6472;
-
-            outline: none;
-            border: none;
-
-            border-radius: 0px 5px 5px 0px;
-            transition: 0.2s linear;
-        }
-
-        input[id="txt-input"] {
-            width: 250px;
-        }
-
-        /* focus  */
-        input:focus {
-            transform: translateX(-2px);
-            border-radius: 5px;
-        }
-
-        /* //////////////////////////////////////////// */
-        /* //////////////////////////////////////////// */
-
-        /* input[type="text"] {min-width: 250px;} */
-        /* buttons  */
-        button {
-            display: inline-block;
-            color: #252537;
-
-            width: 280px;
-            height: 50px;
-
-            padding: 0 20px;
-            background: #fff;
-            border-radius: 5px;
-
-            outline: none;
-            border: none;
-
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #27ae60);
+            transform: translateY(-2px);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #95a5a6;
+            font-size: 14px;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .divider::before {
+            margin-right: 15px;
+        }
+
+        .divider::after {
+            margin-left: 15px;
+        }
+
+        /* Social Login */
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .google {
+            background: #db4437;
+        }
+
+        .facebook {
+            background: #4267B2;
+        }
+
+        .twitter {
+            background: #1DA1F2;
+        }
+
+        /* Sign Up Link */
+        .signup-link {
             text-align: center;
-            transition: all 0.2s linear;
-
-            margin: 7% auto;
-            letter-spacing: 0.05em;
+            margin-top: 25px;
+            font-size: 14px;
         }
 
-        /* Submits */
-        .submits {
-            width: 48%;
-            display: inline-block;
-            float: left;
-            margin-left: 2%;
+        .signup-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
         }
 
-        /*       Forgot Password button FAF3DD  */
-        .frgt-pass {
-            background: transparent;
+        .signup-link a:hover {
+            color: #2980b9;
+            text-decoration: underline;
         }
 
-        /*     Sign Up button  */
-        .sign-up {
-            background: #b8f2e6;
-        }
-
-        /* buttons hover */
-        button:hover {
-            transform: translatey(3px);
-            box-shadow: none;
-        }
-
-        /* buttons hover Animation */
-        button:hover {
-            animation: ani9 0.4s ease-in-out infinite alternate;
-        }
-
-        @keyframes ani9 {
-            0% {
-                transform: translateY(3px);
+        /* Responsive Adjustments */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
             }
-            100% {
-                transform: translateY(5px);
+
+            .login-header h2 {
+                font-size: 24px;
             }
         }
-
-
     </style>
 </head>
 <body>
+<div class="login-container">
+    <div class="login-header">
+        <div class="logo">P</div>
+        <h2>Welcome Back</h2>
+        <p>Sign in to access your account</p>
+    </div>
 
-<div class="overlay">
     <form method="POST" action="{{ route('login') }}">
         @csrf
-        <div class="con">
-            <header class="head-form">
-                <h2>Log In</h2>
-                <p>login here using your email and password</p>
-            </header>
-            <br>
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-                <div class="field-set">
-                    <span class="input-item">
-          <i class="fa fa-user-circle"></i>
-        </span>
-                    <input class="form-input" name="email" id="email" type="email" placeholder="@Email" required>
 
-                    <br>
-                    <span class="input-item">
-          <i class="fa fa-key"></i>
-        </span>
-                    <input class="form-input" type="password" placeholder="Password" id="password" name="password"
-                           required>
-
-                    <br>
-                    <button class="log-in" type="submit"> Log In</button>
-                </div>
-            </form>
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" id="email" name="email" class="input-field" placeholder="Enter your email" required>
         </div>
 
+        <div class="form-group">
+            <label for="password">Password</label>
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="password" name="password" class="input-field" placeholder="Enter your password" required>
+            <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+        </div>
+
+        <div class="form-options">
+            <div class="remember-me">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember">Remember me</label>
+            </div>
+            <div class="forgot-password">
+                <a href="#" id="forgotPasswordLink">Forgot password?</a>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Sign In</button>
+
+        <div class="divider">or continue with</div>
+
+        <div class="social-login">
+            <div class="social-btn google" id="googleLogin">
+                <i class="fab fa-google"></i>
+            </div>
+            <div class="social-btn facebook" id="facebookLogin">
+                <i class="fab fa-facebook-f"></i>
+            </div>
+            <div class="social-btn twitter" id="twitterLogin">
+                <i class="fab fa-twitter"></i>
+            </div>
+        </div>
+
+        <div class="signup-link">
+            Don't have an account? <a href="#" id="signupLink">Sign up</a>
+        </div>
     </form>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function show() {
-        var p = document.getElementById('pwd');
-        p.setAttribute('type', 'text');
-    }
+    // Toggle password visibility
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
 
-    function hide() {
-        var p = document.getElementById('pwd');
-        p.setAttribute('type', 'password');
-    }
+    togglePassword.addEventListener('click', function() {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.classList.toggle('fa-eye-slash');
+    });
 
-    var pwShown = 0;
+    // Add focus effects
+    const inputs = document.querySelectorAll('.input-field');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.querySelector('.input-icon').style.color = '#3498db';
+        });
 
-    document.getElementById("eye").addEventListener("click", function () {
-        if (pwShown == 0) {
-            pwShown = 1;
-            show();
-        } else {
-            pwShown = 0;
-            hide();
-        }
-    }, false);
+        input.addEventListener('blur', function() {
+            this.parentElement.querySelector('.input-icon').style.color = '#7f8c8d';
+        });
+    });
 
+    // Forgot Password Alert
+    document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Reset Password',
+            html: '<div style="text-align:center;">' +
+                '<i class="fas fa-user-shield" style="font-size:60px;color:#3498db;margin-bottom:20px;"></i>' +
+                '<p style="font-size:16px;margin-bottom:20px;">Please contact your system administrator to reset your account password.</p>' +
+                '</div>',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3498db',
+            customClass: {
+                popup: 'animated bounceIn'
+            }
+        });
+    });
+
+    // Social Login Alerts
+    const socialButtons = ['googleLogin', 'facebookLogin', 'twitterLogin'];
+    socialButtons.forEach(buttonId => {
+        document.getElementById(buttonId).addEventListener('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Account Creation Restricted',
+                html: '<div style="text-align:center;">' +
+                    '<i class="fas fa-exclamation-triangle" style="font-size:60px;color:#e74c3c;margin-bottom:20px;"></i>' +
+                    '<p style="font-size:16px;margin-bottom:20px;">You are not allowed to create accounts via social login. Please contact your administrator for access.</p>' +
+                    '</div>',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#e74c3c',
+                customClass: {
+                    popup: 'animated shake'
+                }
+            });
+        });
+    });
+
+    // Sign Up Link Alert
+    document.getElementById('signupLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Account Creation Restricted',
+            html: '<div style="text-align:center;">' +
+                '<i class="fas fa-exclamation-circle" style="font-size:60px;color:#f39c12;margin-bottom:20px;"></i>' +
+                '<p style="font-size:16px;margin-bottom:20px;">You are not allowed to create accounts. Please contact your administrator for access.</p>' +
+                '</div>',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#f39c12',
+            customClass: {
+                popup: 'animated pulse'
+            }
+        });
+    });
 </script>
 </body>
 </html>
