@@ -78,6 +78,10 @@ class VisitorController extends Controller
      */
     public function pre_registor_visitor(Request $request)
     {
+        $currentUser = auth()->user();
+
+        $userId = $currentUser->id;
+
         $visitor = new Visitor();
         $visitor->full_name = $request->full_name;
         $visitor->company = $request->company;
@@ -88,6 +92,8 @@ class VisitorController extends Controller
         $visitor->identification_number = $request->identification_number;
         $visitor->client_id = $request->client_id;
         $visitor->pre_register = 1;
+        $visitor->client_id = $userId;
+
         $visitor->save();
 
         return response()->json(['success' => true]);
@@ -125,6 +131,8 @@ class VisitorController extends Controller
     public function storeCheckIn(Request $request)
     {
         try {
+            $clientId = $request->header('X-Client-ID') ?? $request->cookie('client_id');
+
             if(isset($request->email)) {
             $visitor = Visitor::where('email', $request->email)
                 ->where('pre_register', 1)
@@ -149,6 +157,7 @@ class VisitorController extends Controller
                 }
                 $visitor->check_in_time = now();
                 $visitor->pre_register = 0;
+                $visitor->client_id = $clientId;
                 $visitor->save();
             } else {
                 $visitor = new Visitor();
@@ -170,6 +179,8 @@ class VisitorController extends Controller
                 }
                 $visitor->check_in_time = now();
                 $visitor->pre_register = 0;
+
+                $visitor->client_id = $clientId;
                 $visitor->save();
             }
             } else {
@@ -192,6 +203,8 @@ class VisitorController extends Controller
                 }
                 $visitor->check_in_time = now();
                 $visitor->pre_register = 0;
+
+                $visitor->client_id = $clientId;
                 $visitor->save();
             }
 
@@ -644,9 +657,20 @@ class VisitorController extends Controller
      */
     public function admin_list()
     {
-        $visitors = Visitor::whereNull('deleted_at')
-            ->orderBy('id', 'desc')
-            ->get();
+        $currentUser = auth()->user();
+
+        $userType = $currentUser->role;
+
+        if ($userType === 'superAdmin') {
+            $visitors = Visitor::whereNull('deleted_at')
+                ->orderBy('id', 'desc')
+                ->get();
+        } else {
+            $visitors = Visitor::whereNull('deleted_at')
+                ->where('client_id', $currentUser->id)
+                ->orderBy('id', 'desc')
+                ->get();
+        }
         return view('visitor.admin_list', compact('visitors'));
     }
 

@@ -16,7 +16,20 @@ class EmployeeController extends Controller
 
     public function index()
     {
-        $employees = Employee::whereNull('deleted_at')->get();
+        $currentUser = auth()->user();
+
+        $userType = $currentUser->role;
+
+        if ($userType === 'superAdmin') {
+            $employees = Employee::whereNull('deleted_at')
+                ->orderBy('id', 'desc')
+                ->get();
+        } else {
+            $employees = Employee::whereNull('deleted_at')
+                ->where('client_id', $currentUser->id)
+                ->orderBy('id', 'desc')
+                ->get();
+        }
         return view('employees.index', compact('employees'));
     }
 
@@ -26,7 +39,18 @@ class EmployeeController extends Controller
 
     public function employers_list()
     {
-        $employees = Employee::whereNull('deleted_at')->get();
+        $currentUser = auth()->user();
+
+        $userType = $currentUser->role;
+
+        if ($userType === 'superAdmin') {
+            $employees = Employee::whereNull('deleted_at')->get();
+        } else {
+            $employees = Employee::whereNull('deleted_at')
+            ->where('client_id', $currentUser->id)
+                ->orderBy('id', 'desc')
+                ->get();
+        }
         return view('employees.employers_list', compact('employees'));
     }
 
@@ -35,7 +59,18 @@ class EmployeeController extends Controller
      */
     public function employers_archive_list()
     {
-        $archivedEmployees = Employee::onlyTrashed()->get();
+        $currentUser = auth()->user();
+
+        $userType = $currentUser->role;
+
+        if ($userType === 'superAdmin') {
+            $archivedEmployees = Employee::onlyTrashed()->get();
+        } else {
+            $archivedEmployees = Employee::onlyTrashed()
+                ->where('client_id', $currentUser->id)
+                ->orderBy('id', 'desc')
+                ->get();
+        }
         return view('employees.employers_archived_list', compact('archivedEmployees'));
     }
 
@@ -65,6 +100,10 @@ class EmployeeController extends Controller
      */
     public function register_employee(Request $request)
     {
+        $currentUser = auth()->user();
+
+        $userId = $currentUser->id;
+
         $request->validate([
             'name' => 'required|string|max:255',
             'company' => 'required|string|max:255',
@@ -79,7 +118,7 @@ class EmployeeController extends Controller
         $employee->email = $request->email;
         $employee->contact_number = $request->contact_number;
         $employee->position = $request->position;
-        $employee->client_id = $request->client_id;
+        $employee->client_id = $userId;
         $employee->save();
 
         return response()->json(['success' => true]);

@@ -13,6 +13,7 @@ class CustomerSubscription extends Model
         'customer_name',
         'customer_email',
         'customer_phone',
+        'client_id',
         'package_type',
         'billing_cycle',
         'payment_intent_id',
@@ -21,7 +22,7 @@ class CustomerSubscription extends Model
         'status',
         'ip_address',
         'start_date',
-        'end_date'
+        'end_date',
     ];
 
     protected $casts = [
@@ -30,4 +31,9 @@ class CustomerSubscription extends Model
         'end_date' => 'datetime',
         'amount' => 'decimal:2'
     ];
+
+    public function subscriptions()
+    {
+        return $this->hasMany(CustomerSubscription::class, 'client_id');
+    }
 }

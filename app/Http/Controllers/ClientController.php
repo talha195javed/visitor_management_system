@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\CustomerSubscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -70,7 +71,7 @@ class ClientController extends Controller
 
         $client->api_token = Str::random(60);
         $client->save();
-
+        $subscriptions = CustomerSubscription::where('client_id', $client->id)->get();
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
@@ -81,7 +82,8 @@ class ClientController extends Controller
                 'email' => $client->email,
                 'phone' => $client->phone,
                 'company' => $client->company,
-            ]
+            ],
+            'subscriptions' => $subscriptions,
         ]);
     }
 
@@ -91,5 +93,33 @@ class ClientController extends Controller
         return response()->json([
             'user' => $request->user()
         ]);
+    }
+
+    public function index(Request $request)
+        {
+            $clients = Client::orderBy('id', 'desc')->get();
+
+            $stats = [
+                'total' => Client::count(),
+                'active' => CustomerSubscription::where('status', 'active')->count(),
+                'revenue' => CustomerSubscription::sum('amount'),
+                'recent' => CustomerSubscription::where('created_at', '>=', now()->subDays(30))->count()
+            ];
+
+            return view('client.index', compact('clients', 'stats'));
+        }
+
+    public function client_subscriptions($id)
+    {
+        $subscriptions = CustomerSubscription::where('client_id', $id)->orderBy('id', 'desc')->get();
+
+        $stats = [
+            'total' => CustomerSubscription::where('client_id', $id)->count(),
+            'active' => CustomerSubscription::where('client_id', $id)->where('status', 'active')->count(),
+            'revenue' => CustomerSubscription::where('client_id', $id)->sum('amount'),
+            'recent' => CustomerSubscription::where('client_id', $id)->where('created_at', '>=', now()->subDays(30))->count()
+        ];
+
+        return view('client.subscription_index', compact('subscriptions', 'stats'));
     }
 }
