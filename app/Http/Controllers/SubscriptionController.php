@@ -60,4 +60,69 @@ class SubscriptionController extends Controller
         return redirect()->route('subscriptions.index')
             ->with('success', 'Subscription cancelled successfully');
     }
+
+    public function saveCustomerDetails(Request $request)
+    {
+        // Log incoming request data
+        Log::info('Incoming Request:', $request->all());
+
+        // Listen to DB queries for debugging
+        DB::listen(function ($query) {
+            Log::info('SQL Query: ' . $query->sql, $query->bindings);
+        });
+
+        // Validate request
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'client_id' => 'required|string|max:20',
+            'package_type' => 'required|string|in:basic,professional,enterprise',
+            'duration' => 'required|string|in:monthly,yearly',
+            'payment_intent_id' => 'required|string',
+            'amount' => 'required|numeric',
+            'currency' => 'required|string|size:3',
+        ]);
+
+        try {
+            // Create subscription record
+            $subscription = CustomerSubscription::create([
+                'customer_name' => $validated['name'],
+                'customer_email' => $validated['email'],
+                'customer_phone' => $validated['phone'],
+                'client_id' => $validated['client_id'],
+                'package_type' => $validated['package_type'],
+                'billing_cycle' => $validated['duration'],
+                'payment_intent_id' => $validated['payment_intent_id'],
+                'amount' => $validated['amount'],
+                'currency' => $validated['currency'],
+                'status' => 'active',
+                'ip_address' => $request->ip(),
+                'start_date' => now(),
+                'end_date' => $validated['duration'] === 'yearly' ? now()->addYear() : now()->addMonth(),
+            ]);
+
+            if ($subscription) {
+                Log::info('Subscription Saved Successfully', $subscription->toArray());
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Customer details and subscription saved successfully',
+                    'data' => $subscription
+                ]);
+            } else {
+                Log::error('Failed to Save Subscription');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to save customer subscription'
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Exception while saving subscription', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error occurred: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

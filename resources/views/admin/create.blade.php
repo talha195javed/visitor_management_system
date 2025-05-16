@@ -61,7 +61,7 @@
                                         <select id="role" name="role" class="form-control" required>
                                             <option value="">Select Role</option>
                                             <option value="admin">Super Admin</option>
-                                            <option value="manager">Manager</option>
+<!--                                            <option value="manager">Manager</option>-->
                                             <option value="client">Client</option>
                                         </select>
                                     </div>

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ClientLoginController;
 use App\Http\Controllers\CompanyInfoController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
@@ -12,13 +14,32 @@ use App\Http\Controllers\FieldSettingController;
 
 // Landing Page
 // Rename the visitor home route
-Route::get('/', [VisitorController::class, 'index'])->name('visitor.home');  // visitor homepage route
+
+Route::middleware(['client.auth'])->group(function () {
+    Route::get('/', [VisitorController::class, 'index'])->name('visitor.home');
+    Route::get('/check-in', [VisitorController::class, 'showCheckIn'])->name('visitor.checkin');
+    Route::get('/visitor/select-role/{id}', [VisitorController::class, 'showRoleSelection'])->name('visitor.selectRole');
+    Route::get('/visitor/select-purpose/{id}', [VisitorController::class, 'selectPurpose'])->name('visitor.selectPurpose');
+    Route::get('/visitor/capture/{id}', [VisitorController::class, 'captureImageView'])->name('visitor.captureImage');
+    Route::get('/visitor/capture_id/{id}', [VisitorController::class, 'captureIdView'])->name('visitor.captureIdView');
+    Route::get('/visitor/{id}/emergency-contact', [VisitorController::class, 'showEmergencyContactForm'])->name('visitor.showEmergencyContact');
+    Route::get('/visitor/confirmation/{id}', [VisitorController::class, 'showAgreement'])->name('visitor.agreement');
+    Route::get('/visitor/success/{id}', [VisitorController::class, 'visitor_success'])->name('visitor.success');
+});
+
+Route::get('/client/logout', function() {
+    Auth::logout(); // Logout user if authenticated
+    session()->flush(); // Clear session
+    return redirect('/client/login'); // Redirect to login page
+})->name('client.logout');
+
+//Route::get('/', [VisitorController::class, 'index'])->name('visitor.home');  // visitor homepage route
 
 // Keep the home route for authenticated users
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth');
 
 // Visitor Check-in & Check-out (Public)
-Route::get('/check-in', [VisitorController::class, 'showCheckIn'])->name('visitor.checkin');
+//Route::get('/check-in', [VisitorController::class, 'showCheckIn'])->name('visitor.checkin');
 Route::post('/check-in', [VisitorController::class, 'storeCheckIn'])->name('visitor.storeCheckIn');
 Route::post('/update-visitor', [VisitorController::class, 'update_visitor'])->name('update.visitor');
 
@@ -35,38 +56,38 @@ Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware(
 
 Route::post('/visitor/upload-photo', [VisitorController::class, 'uploadPhoto'])->name('visitor.uploadPhoto');
 
-Route::get('/visitor/capture/{id}', [VisitorController::class, 'captureImageView'])->name('visitor.captureImage');
+//Route::get('/visitor/capture/{id}', [VisitorController::class, 'captureImageView'])->name('visitor.captureImage');
 Route::post('/visitor/capture/{id}', [VisitorController::class, 'storeCapturedImage'])->name('visitor.storeCapturedImage');
 
 
-Route::get('/visitor/capture_id/{id}', [VisitorController::class, 'captureIdView'])->name('visitor.captureIdView');
+//Route::get('/visitor/capture_id/{id}', [VisitorController::class, 'captureIdView'])->name('visitor.captureIdView');
 Route::post('/visitor/capture_id/{id}', [VisitorController::class, 'storeCapturedIdImage'])->name('visitor.storeCapturedIdImage');
 
 
 Route::get('/visitor/check-in-complete', [VisitorController::class, 'checkInComplete'])->name('visitor.checkInComplete');
 
-Route::get('/visitor/select-role/{id}', [VisitorController::class, 'showRoleSelection'])->name('visitor.selectRole');
+//Route::get('/visitor/select-role/{id}', [VisitorController::class, 'showRoleSelection'])->name('visitor.selectRole');
 Route::post('/visitor/set-role/{id}', [VisitorController::class, 'setRole'])->name('visitor.setRole');
 
 
 Route::resource('employees', EmployeeController::class);
 
-Route::get('/visitor/select-purpose/{id}', [VisitorController::class, 'selectPurpose'])->name('visitor.selectPurpose');
+//Route::get('/visitor/select-purpose/{id}', [VisitorController::class, 'selectPurpose'])->name('visitor.selectPurpose');
 Route::post('/visitor/store-purpose/{id}', [VisitorController::class, 'storePurpose'])->name('visitor.storePurpose');
 
 Route::post('/visitor/check-pre-registered', [VisitorController::class, 'checkPreRegistered'])->name('visitor.checkPreRegistered');
 
-Route::get('/visitor/{id}/emergency-contact', [VisitorController::class, 'showEmergencyContactForm'])->name('visitor.showEmergencyContact');
+//Route::get('/visitor/{id}/emergency-contact', [VisitorController::class, 'showEmergencyContactForm'])->name('visitor.showEmergencyContact');
 Route::post('/visitor/{id}/emergency-contact', [VisitorController::class, 'storeEmergencyContact'])->name('visitor.storeEmergencyContact');
 
-Route::get('/visitor/confirmation/{id}', [VisitorController::class, 'showAgreement'])
-    ->name('visitor.agreement');
+//Route::get('/visitor/confirmation/{id}', [VisitorController::class, 'showAgreement'])
+//    ->name('visitor.agreement');
 
 Route::post('/visitor/agreement/{id}', [VisitorController::class, 'storeAgreement'])
     ->name('visitor.storeAgreement');
 
-Route::get('/visitor/success/{id}', [VisitorController::class, 'visitor_success'])
-    ->name('visitor.success');
+//Route::get('/visitor/success/{id}', [VisitorController::class, 'visitor_success'])
+//    ->name('visitor.success');
 
 Route::get('employers_list', [EmployeeController::class, 'employers_list'])->name('employers_list');
 
@@ -128,8 +149,12 @@ Route::get('/visitor/search', [VisitorController::class, 'search_visitor'])->nam
 
 Route::post('/company-info/upload', [CompanyInfoController::class, 'uploadImages'])->name('company_info.upload');
 
-Route::get('/subscriptions/index', [SubscriptionController::class, 'index'])
-    ->name('admin.subscriptions.index');
+Route::get('/subscriptions/index', [SubscriptionController::class, 'index'])->name('admin.subscriptions.index');
+
+Route::get('/client_subscriptions/{id}', [ClientController::class, 'client_subscriptions'])->name('admin.client_subscriptions.show');
+
+Route::get('/clients/index', [ClientController::class, 'index'])->name('admin.clients.index');
+
 Route::get('/subscriptions/{id}', [SubscriptionController::class, 'show'])->name('admin.subscriptions.show');
 
 
@@ -137,3 +162,6 @@ Route::get('/subscriptions/{id}/edit', [SubscriptionController::class, 'edit'])-
 Route::put('/subscriptions/{id}', [SubscriptionController::class, 'update'])->name('admin.subscriptions.update');
 Route::delete('/subscriptions/{id}', [SubscriptionController::class, 'destroy'])->name('admin.subscriptions.destroy');
 
+Route::get('/client/login', [ClientLoginController::class, 'showLoginForm'])->name('client.login');
+Route::post('/client/login', [ClientLoginController::class, 'login']);
+Route::post('/client/logout', [ClientLoginController::class, 'logout'])->name('client.logout');

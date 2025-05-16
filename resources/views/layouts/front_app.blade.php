@@ -13,6 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js" defer></script>
     <link rel="stylesheet" href="{{ asset('css/common_style.css') }}">
+    <script src="{{ asset('js/client/client-auth.js') }}"></script>
 
     @stack('styles')
 </head>

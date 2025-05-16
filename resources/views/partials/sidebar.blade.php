@@ -62,7 +62,7 @@
             </ul>
         </li>
 
-        @if(auth()->user() && (auth()->user()->role == 'admin' || auth()->user()->role == 'manager' || auth()->user()->role == 'superAdmin'))
+        @if(auth()->user() && (auth()->user()->role == 'client' || auth()->user()->role == 'superAdmin'))
         <li class="nav-item has-submenu">
             <a class="nav-link collapsed" data-bs-target="#employees-nav" data-bs-toggle="collapse" href="#">
                 <div class="nav-icon">
@@ -142,7 +142,7 @@
                 <div class="nav-icon">
                     <i class="bi bi-credit-card-2-front-fill"></i>
                 </div>
-                <span>Payments</span>
+                <span>Subscription</span>
                 <div class="submenu-arrow">
                     <i class="bi bi-chevron-down"></i>
                 </div>
@@ -150,9 +150,15 @@
             </a>
             <ul id="payments-nav" class="submenu collapse" data-bs-parent="#sidebar-nav">
                 <li class="submenu-item">
+                    <a href="{{ route('admin.clients.index') }}">
+                        <i class="bi bi-record-circle"></i>
+                        <span>Clients</span>
+                    </a>
+                </li>
+                <li class="submenu-item">
                     <a href="{{ route('admin.subscriptions.index') }}">
                         <i class="bi bi-record-circle"></i>
-                        <span>Subscriptions</span>
+                        <span>All Subscriptions</span>
                     </a>
                 </li>
             </ul>

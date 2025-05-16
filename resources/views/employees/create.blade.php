@@ -86,7 +86,7 @@
                 var formData = $(this).serialize();
 
                 $.ajax({
-                    url: '/employers_list',
+                    url: '/register-employee',
                     type: 'POST',
                     data: formData,
                     success: function(response) {

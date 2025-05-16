@@ -128,6 +128,49 @@
             font-size: 18px;
         }
 
+        /* Radio Button Styles */
+        .user-type-options {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .user-type-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .user-type-option input[type="radio"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #3498db;
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            margin-right: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .user-type-option input[type="radio"]:checked::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 8px;
+            height: 8px;
+            background: #3498db;
+            border-radius: 50%;
+        }
+
+        .user-type-option input[type="radio"]:focus {
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
         /* Remember Me & Forgot Password */
         .form-options {
             display: flex;
@@ -290,6 +333,20 @@
             <i class="fas fa-lock input-icon"></i>
             <input type="password" id="password" name="password" class="input-field" placeholder="Enter your password" required>
             <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+        </div>
+
+        <div class="form-group">
+            <label>Login as:</label>
+            <div class="user-type-options">
+                <label class="user-type-option">
+                    <input type="radio" name="user_type" value="client" checked>
+                    Client
+                </label>
+                <label class="user-type-option">
+                    <input type="radio" name="user_type" value="super_admin">
+                    Super Admin
+                </label>
+            </div>
         </div>
 
         <div class="form-options">
