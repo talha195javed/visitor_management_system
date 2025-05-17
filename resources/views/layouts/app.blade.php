@@ -32,9 +32,9 @@
     <!-- SweetAlert2 for stylish popups -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
-
-    <!-- Template Main CSS File -->
+    <!-- Main CSS File -->
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     @stack('styles')
@@ -42,10 +42,14 @@
 
 <body>
 @include('partials.admin_header')
-<!-- Sidebar -->
-@include('partials.sidebar')
 
-    @yield('content')
+<div class="main-wrapper">
+    @include('partials.sidebar')
+
+    <main class="main-content">
+        @yield('content')
+    </main>
+</div>
 
 <!-- Vendor JS Files -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -63,5 +67,6 @@
 <!-- Template Main JS File -->
 <script src="{{ asset('assets/js/main.js') }}"></script>
 
+@stack('scripts')
 </body>
 </html>

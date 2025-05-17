@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\MailLog;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
@@ -18,7 +19,16 @@ class AdminController extends Controller
 
     public function clients_list()
     {
-        $clients = Client::all();
+        $clients = DB::table('users')
+            ->leftJoin('clients', 'users.email', '=', 'clients.email')
+            ->where('users.role', 'client')
+            ->select('users.id as user_id',
+                'users.name as user_name',
+                'users.email as user_email',
+                'clients.id as client_id',
+                'clients.company as client_company',
+                'clients.phone as client_phone')
+            ->get();
         return view('admin.client_list', compact('clients'));
     }
 

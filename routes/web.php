@@ -165,3 +165,6 @@ Route::delete('/subscriptions/{id}', [SubscriptionController::class, 'destroy'])
 Route::get('/client/login', [ClientLoginController::class, 'showLoginForm'])->name('client.login');
 Route::post('/client/login', [ClientLoginController::class, 'login']);
 Route::post('/client/logout', [ClientLoginController::class, 'logout'])->name('client.logout');
+
+
+Route::get('/client/visitors/{client}', [ClientController::class, 'getClientVisitors'])->name('client.visitors');

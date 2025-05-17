@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\CustomerSubscription;
+use App\Models\User;
+use App\Models\Visitor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -121,5 +123,35 @@ class ClientController extends Controller
         ];
 
         return view('client.subscription_index', compact('subscriptions', 'stats'));
+    }
+
+    /**
+     * Get all visitors for a specific client
+     *
+     * @param int $clientId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getClientVisitors($clientId)
+    {
+        try {
+            // Validate client exists
+            $client = User::findOrFail($clientId);
+
+            // Get visitors for this client
+            $visitors = Visitor::where('client_id', $clientId)
+                ->orderBy('id', 'desc')
+                ->get();
+            return response()->json([
+                'success' => true,
+                'visitors' => $visitors,
+                'client_name' => $client->user_name
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching visitor data'
+            ], 500);
+        }
     }
 }

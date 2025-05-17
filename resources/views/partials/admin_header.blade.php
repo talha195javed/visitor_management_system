@@ -1,5 +1,10 @@
 <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm fixed-top">
     <div class="container">
+        <!-- Mobile sidebar toggle button -->
+        <button class="sidebar-mobile-toggler me-3 d-lg-none" type="button">
+            <i class="bi bi-list"></i>
+        </button>
+
         <a class="navbar-brand" href="{{ url('/') }}">
             <img src="{{ asset('assets/img/admin_logo.png') }}" alt="Brand Logo" class="img-fluid" style="height: 50px;">
         </a>
@@ -60,3 +65,36 @@
         </div>
     </div>
 </nav>
+
+<style>
+    .sidebar-mobile-toggler {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #2c3e50;
+        padding: 0.25rem 0.5rem;
+    }
+
+    @media (min-width: 993px) {
+        .sidebar-mobile-toggler {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileToggler = document.querySelector('.sidebar-mobile-toggler');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.overlay');
+        const body = document.body;
+
+        if (mobileToggler) {
+            mobileToggler.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+                if (overlay) overlay.classList.toggle('active');
+                body.classList.toggle('no-scroll');
+            });
+        }
+    });
+</script>
