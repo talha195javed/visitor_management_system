@@ -1,6 +1,43 @@
+/* Main content adjustment */
+.main-content {
+    margin-left: 280px;
+    transition: margin-left 0.3s ease;
+    padding: 20px;
+    min-height: calc(100vh - 60px); /* Adjust based on header height */
+    padding-top: 70px; /* To account for fixed header */
+}
+
+.main-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+@media (max-width: 992px) {
+    .main-content {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+}
+
+/* Header adjustment to work with sidebar */
+.navbar {
+    padding-left: 280px;
+    transition: padding-left 0.3s ease;
+    z-index: 1000;
+}
+
+@media (max-width: 992px) {
+    .navbar {
+        padding-left: 15px;
+    }
+}
+
+/* Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Bootstrap import */
 @import "bootstrap/dist/css/bootstrap.min.css";
 @import "@fortawesome/fontawesome-free/css/all.min.css";
 @import "animate.css/animate.min.css";

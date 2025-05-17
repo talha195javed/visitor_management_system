@@ -192,6 +192,8 @@
     </div>
 </aside>
 
+<div class="overlay"></div>
+
 <style>
 
     .nav-highlight {
@@ -482,16 +484,108 @@
     .sidebar-toggler {
         display: none;
     }
+
+         /* Existing sidebar styles */
+     .sidebar {
+         width: 280px;
+         background: #fff;
+         border-right: 1px solid #e9ecef;
+         min-height: 100vh;
+         position: fixed;
+         top: 0;
+         left: 0;
+         display: flex;
+         flex-direction: column;
+         box-shadow: 0 0 20px rgba(0, 0, 0, 0.03);
+         transition: all 0.3s ease;
+         font-family: 'Segoe UI', sans-serif;
+         z-index: 1001;
+     }
+
+    /* Add these new responsive styles */
+    @media (max-width: 992px) {
+        .sidebar {
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-toggler {
+            display: block;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+    }
+
+    /* For desktop screens */
+    @media (min-width: 993px) {
+        .sidebar-toggler {
+            display: none !important;
+        }
+    }
+
+    /* Scroll lock when sidebar is open */
+    .no-scroll {
+        overflow: hidden;
+    }
+
+    /* Rest of your existing sidebar styles */
+    /* ... (keep all your existing styles) ... */
 </style>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Toggle functionality for mobile
-        const toggler = document.querySelector('.sidebar-toggler');
-        if (toggler) {
-            toggler.addEventListener('click', function() {
-                document.querySelector('.sidebar').classList.toggle('show');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggler = document.querySelector('.sidebar-toggler');
+        const overlay = document.querySelector('.overlay');
+        const body = document.body;
+
+        // Toggle sidebar on mobile
+        if (sidebarToggler) {
+            sidebarToggler.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('active');
+                body.classList.toggle('no-scroll');
             });
         }
+
+        // Close sidebar when clicking on overlay
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('active');
+                body.classList.remove('no-scroll');
+            });
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 992 && !sidebar.contains(e.target) {
+                sidebar.classList.remove('show');
+                if (overlay) overlay.classList.remove('active');
+                body.classList.remove('no-scroll');
+            }
+        });
 
         // Keep submenus open if they contain active items
         const activeSubmenuItems = document.querySelectorAll('.submenu-item a.active');
@@ -505,6 +599,18 @@
                     parentLink.setAttribute('aria-expanded', 'true');
                 }
             }
+        });
+
+        // Auto-close sidebar on mobile when clicking a link
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 992) {
+                    sidebar.classList.remove('show');
+                    if (overlay) overlay.classList.remove('active');
+                    body.classList.remove('no-scroll');
+                }
+            });
         });
     });
 </script>
