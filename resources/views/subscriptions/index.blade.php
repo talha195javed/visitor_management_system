@@ -131,10 +131,10 @@
                                                class="btn btn-sm btn-outline-primary" title="View">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.subscriptions.edit', $subscription->id) }}"
-                                               class="btn btn-sm btn-outline-warning" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
+<!--                                            <a href="{{ route('admin.subscriptions.edit', $subscription->id) }}"-->
+<!--                                               class="btn btn-sm btn-outline-warning" title="Edit">-->
+<!--                                                <i class="fas fa-edit"></i>-->
+<!--                                            </a>-->
                                             <form action="{{ route('admin.subscriptions.destroy', $subscription->id) }}"
                                                   method="POST" style="display: inline;">
                                                 @csrf

@@ -21,6 +21,36 @@ class SubscriptionController extends Controller
         return view('subscriptions.index', compact('subscriptions', 'stats'));
     }
 
+    public function client_index()
+    {
+        $currentUser = auth()->user();
+
+        $userType = $currentUser->role;
+
+        $query = CustomerSubscription::query()->orderBy('id', 'desc');
+
+        if ($userType === 'client') {
+            $query->where('customer_email', $currentUser->email);
+        }
+
+        $subscriptions = $query->get();
+
+        $baseQuery = CustomerSubscription::query();
+        if ($userType === 'client') {
+            $baseQuery->where('customer_email', $currentUser->email);
+        }
+
+        $stats = [
+            'total' => (clone $baseQuery)->count(),
+            'active' => (clone $baseQuery)->where('status', 'active')->count(),
+            'revenue' => (clone $baseQuery)->sum('amount'),
+            'recent' => (clone $baseQuery)->where('created_at', '>=', now()->subDays(30))->count(),
+        ];
+
+
+        return view('subscriptions.index', compact('subscriptions', 'stats'));
+    }
+
     public function show($id)
     {
         $subscription = CustomerSubscription::findOrFail($id);

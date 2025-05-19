@@ -42,6 +42,14 @@ class ClientController extends Controller
                 'api_token' => Str::random(60),
             ]);
 
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'client',
+                'api_token' => Str::random(60),
+            ]);
+
             return response()->json([
                 'success' => true,
                 'token' => $client->api_token,

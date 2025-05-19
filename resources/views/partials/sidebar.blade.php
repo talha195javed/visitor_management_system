@@ -91,6 +91,28 @@
         </li>
         @endif
 
+        @if(auth()->user() && (auth()->user()->role == 'client'))
+        <li class="nav-item has-submenu">
+            <a class="nav-link collapsed" data-bs-target="#payments-nav" data-bs-toggle="collapse" href="#">
+                <div class="nav-icon">
+                    <i class="bi bi-credit-card-2-front-fill"></i>
+                </div>
+                <span>My Subscription</span>
+                <div class="submenu-arrow">
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+                <div class="nav-highlight"></div>
+            </a>
+            <ul id="payments-nav" class="submenu collapse" data-bs-parent="#sidebar-nav">
+                <li class="submenu-item">
+                    <a href="{{ route('admin.client_subscriptions.index') }}">
+                        <i class="bi bi-record-circle"></i>
+                        <span>My All Subscriptions</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        @endif
         @if(auth()->user() && (auth()->user()->role == 'admin' || auth()->user()->role == 'superAdmin'))
         <li class="nav-item has-submenu">
             <a class="nav-link collapsed" data-bs-target="#admin-nav" data-bs-toggle="collapse" href="#">
@@ -159,6 +181,12 @@
                     <a href="{{ route('admin.subscriptions.index') }}">
                         <i class="bi bi-record-circle"></i>
                         <span>All Subscriptions</span>
+                    </a>
+                </li>
+                <li class="submenu-item">
+                    <a href="{{ route('admin.subscriptions.index') }}">
+                        <i class="bi bi-record-circle"></i>
+                        <span>Packages List</span>
                     </a>
                 </li>
             </ul>
