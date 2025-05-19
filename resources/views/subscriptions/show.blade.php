@@ -7,7 +7,7 @@
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/home">Home</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('subscriptions.index') }}">Subscriptions</a></li>
+                <li class="breadcrumb-item"><a href="/subscriptions/index">Subscriptions</a></li>
                 <li class="breadcrumb-item active">Details</li>
             </ol>
         </nav>
@@ -62,7 +62,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('subscriptions.index') }}" class="btn btn-secondary">
+                            <a href="/subscriptions/index" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left me-1"></i> Back to List
                             </a>
                             <div>

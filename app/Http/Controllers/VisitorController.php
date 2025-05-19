@@ -661,13 +661,13 @@ class VisitorController extends Controller
 
         $userType = $currentUser->role;
 
-        if ($userType === 'superAdmin') {
+        if ($userType === 'client') {
             $visitors = Visitor::whereNull('deleted_at')
+                ->where('client_id', $currentUser->id)
                 ->orderBy('id', 'desc')
                 ->get();
         } else {
             $visitors = Visitor::whereNull('deleted_at')
-                ->where('client_id', $currentUser->id)
                 ->orderBy('id', 'desc')
                 ->get();
         }
@@ -687,9 +687,22 @@ class VisitorController extends Controller
      */
     public function admin_checkedIn()
     {
-        $visitors = Visitor::whereNull('check_out_time')
-            ->whereNotNull('check_in_time')
-            ->get();
+        $currentUser = auth()->user();
+
+        $userType = $currentUser->role;
+
+        if ($userType === 'client') {
+            $visitors = Visitor::whereNull('check_out_time')
+                ->whereNotNull('check_in_time')
+                ->whereNull('check_out_time')
+                ->where('client_id', $currentUser->id)
+                ->get();
+        } else {
+            $visitors = Visitor::whereNull('check_out_time')
+                ->whereNotNull('check_in_time')
+                ->whereNull('check_out_time')
+                ->get();
+        }
         return view('visitor.admin_checked_in', compact('visitors'));
     }
 
@@ -698,7 +711,17 @@ class VisitorController extends Controller
      */
     public function admin_checkedOut()
     {
-        $visitors = Visitor::whereNotNull('check_out_time')->get();
+        $currentUser = auth()->user();
+
+        $userType = $currentUser->role;
+
+        if ($userType === 'client') {
+            $visitors = Visitor::whereNotNull('check_out_time')
+                ->where('client_id', $currentUser->id)
+                ->get();
+        } else {
+            $visitors = Visitor::whereNotNull('check_out_time')->get();
+        }
         return view('visitor.admin_checked_out', compact('visitors'));
     }
 
@@ -744,7 +767,17 @@ class VisitorController extends Controller
      */
     public function visitors_archive_list()
     {
-        $archivedVisitors = Visitor::onlyTrashed()->get();
+        $currentUser = auth()->user();
+
+        $userType = $currentUser->role;
+
+        if ($userType === 'client') {
+            $archivedVisitors = Visitor::onlyTrashed()
+                ->where('client_id', $currentUser->id)
+                ->get();
+        } else {
+            $archivedVisitors = Visitor::onlyTrashed()->get();
+        }
         return view('visitor.visitors_archived_list', compact('archivedVisitors'));
     }
 

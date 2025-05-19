@@ -151,6 +151,8 @@ Route::post('/company-info/upload', [CompanyInfoController::class, 'uploadImages
 
 Route::get('/subscriptions/index', [SubscriptionController::class, 'index'])->name('admin.subscriptions.index');
 
+Route::get('/client_subscriptions/index', [SubscriptionController::class, 'client_index'])->name('admin.client_subscriptions.index');
+
 Route::get('/client_subscriptions/{id}', [ClientController::class, 'client_subscriptions'])->name('admin.client_subscriptions.show');
 
 Route::get('/clients/index', [ClientController::class, 'index'])->name('admin.clients.index');
