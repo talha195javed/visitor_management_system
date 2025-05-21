@@ -98,6 +98,28 @@ class ClientController extends Controller
     }
 
 
+    public function latest(Request $request)
+    {
+        $userId = $request->query('user_id');
+
+        $client = Client::where('id', $userId)->first();
+
+        $subscriptions = CustomerSubscription::where('client_id', $client->id)->get();
+        return response()->json([
+            'success' => true,
+            'token' => $client->api_token,
+            'user' => [
+                'id' => $client->id,
+                'name' => $client->name,
+                'email' => $client->email,
+                'phone' => $client->phone,
+                'company' => $client->company,
+            ],
+            'subscriptions' => $subscriptions,
+        ]);
+    }
+
+
     public function getUser(Request $request)
     {
         return response()->json([

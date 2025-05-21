@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VisitorController;
 use App\Models\CustomerData;
+use Illuminate\Support\Carbon;
+use App\Models\CustomerSubscription;
 
 Route::get('/test', function () {
     return response()->json(['message' => 'API is working!']);
@@ -109,13 +111,12 @@ Route::post('/create-payment-intent', function (Request $request) {
     }
 });
 
-
 Route::post('/save-customer-details', function(Request $request) {
     $validated = $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'phone' => 'required|string|max:20',
-        'client_id' => 'required|string|max:20',
+        'client_id' => 'required|max:20',
         'package_type' => 'required|string|in:basic,professional,enterprise',
         'duration' => 'required|string|in:monthly,yearly',
         'payment_intent_id' => 'required|string',
@@ -124,8 +125,33 @@ Route::post('/save-customer-details', function(Request $request) {
     ]);
 
     try {
-        // Create a new customer subscription record
-        $subscription = \App\Models\CustomerSubscription::create([
+        $startDate = now(); // default
+
+        // If startOnExpiry is true
+        if ($request->startOnExpiry && $request->existing_subscription_end_date) {
+            $existingEndDate = Carbon::parse($request->existing_subscription_end_date);
+            $startDate = $existingEndDate->copy()->addSecond();
+
+            // If startNow is true and existing subscription exists, end that one now
+        } elseif ($request->startNow) {
+            $startDate = now();
+
+            if (!empty($request->existing_subscription_id)) {
+                $existingSub = CustomerSubscription::find($request->existing_subscription_id);
+                if ($existingSub) {
+                    $existingSub->end_date = now();
+                    $existingSub->save();
+                }
+            }
+        }
+
+        // Calculate end date based on new start date
+        $endDate = $validated['duration'] === 'yearly'
+            ? $startDate->copy()->addYear()
+            : $startDate->copy()->addMonth();
+
+        // Create the new subscription
+        $subscription = CustomerSubscription::create([
             'customer_name' => $validated['name'],
             'customer_email' => $validated['email'],
             'customer_phone' => $validated['phone'],
@@ -137,14 +163,9 @@ Route::post('/save-customer-details', function(Request $request) {
             'currency' => $validated['currency'],
             'status' => 'active',
             'ip_address' => $request->ip(),
-            'start_date' => now(),
-            'end_date' => $validated['duration'] === 'yearly'
-                ? now()->addYear()
-                : now()->addMonth(),
+            'start_date' => $startDate,
+            'end_date' => $endDate,
         ]);
-
-        // Send confirmation email (you'll need to implement this)
-        // Mail::to($validated['email'])->send(new SubscriptionConfirmation($subscription));
 
         return response()->json([
             'success' => true,
@@ -164,6 +185,8 @@ Route::post('/save-customer-details', function(Request $request) {
     }
 });
 
+
 Route::post('/client/register', [ClientController::class, 'register']);
 Route::post('/client/login', [ClientController::class, 'login']);
+Route::get('/client/latest', [ClientController::class, 'latest']);
 Route::middleware('auth:sanctum')->get('/user', [ClientController::class, 'getUser']);
