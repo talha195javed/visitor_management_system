@@ -92,6 +92,7 @@
         @endif
 
         @if(auth()->user() && (auth()->user()->role == 'client'))
+
         <li class="nav-item has-submenu">
             <a class="nav-link collapsed" data-bs-target="#payments-nav" data-bs-toggle="collapse" href="#">
                 <div class="nav-icon">
@@ -104,10 +105,20 @@
                 <div class="nav-highlight"></div>
             </a>
             <ul id="payments-nav" class="submenu collapse" data-bs-parent="#sidebar-nav">
-                <li class="submenu-item">
-                    <a href="{{ route('admin.client_subscriptions.index') }}">
-                        <i class="bi bi-record-circle"></i>
-                        <span>My All Subscriptions</span>
+
+                <li class="nav-item mt-4">
+                    <a class="nav-link {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}"
+                       href="{{ route('admin.client_subscriptions.index') }}">
+                        <i class="fas fa-box-open me-2"></i>
+                        My All Subscriptions
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}"
+                       href="{{ route('admin.packages.index') }}">
+                        <i class="fas fa-box-open me-2"></i>
+                        Packages
                     </a>
                 </li>
             </ul>

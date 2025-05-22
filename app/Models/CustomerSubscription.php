@@ -17,6 +17,8 @@ class CustomerSubscription extends Model
         'package_type',
         'billing_cycle',
         'payment_intent_id',
+        'stripe_customer_id',
+        'payment_method_id',
         'amount',
         'currency',
         'status',
