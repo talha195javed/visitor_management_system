@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\Employee;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -91,7 +92,8 @@ class EmployeeController extends Controller
      */
     public function create_employee()
     {
-        return view('employees.create');
+        $clients = Client::orderBy('id', 'desc')->get();
+        return view('employees.create', compact('clients'));
     }
 
     /**
@@ -110,6 +112,7 @@ class EmployeeController extends Controller
             'position' => 'required|string|max:255',
             'email' => 'required|email|unique:employees',
             'contact_number' => 'required|string|max:15',
+            'client_id' => 'required|string|max:15',
         ]);
 
         $employee = new Employee();
@@ -118,7 +121,14 @@ class EmployeeController extends Controller
         $employee->email = $request->email;
         $employee->contact_number = $request->contact_number;
         $employee->position = $request->position;
+        if (auth()->user()->role == 'superAdmin')
+        {
+            $employee->client_id = $request->client_id;
+        }
+        else {
         $employee->client_id = $userId;
+        }
+
         $employee->save();
 
         return response()->json(['success' => true]);

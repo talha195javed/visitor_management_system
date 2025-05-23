@@ -17,22 +17,25 @@ class PackageController extends Controller
         $client = auth()->user();
 
         // Get active subscriptions
-        $subscriptions = $client->subscriptions ?? [];
+        $subscriptions = CustomerSubscription::where('client_id', $client->id)->get();
         $hasActiveSubscription = false;
         $latestActiveSubscription = null;
 
-        if (count($subscriptions)) {
+        if ($subscriptions->isNotEmpty()) {
             $now = now();
-            $activeSubscriptions = array_filter($subscriptions, function($sub) use ($now) {
+
+            // Filter active subscriptions using Collection's filter method
+            $activeSubscriptions = $subscriptions->filter(function ($sub) use ($now) {
                 return strtotime($sub->end_date) > $now->timestamp;
             });
 
-            if (count($activeSubscriptions)) {
-                usort($activeSubscriptions, function($a, $b) {
-                    return strtotime($b->end_date) - strtotime($a->end_date);
+            if ($activeSubscriptions->isNotEmpty()) {
+                // Sort by end_date descending using sortByDesc
+                $sortedActiveSubscriptions = $activeSubscriptions->sortByDesc(function ($sub) {
+                    return strtotime($sub->end_date);
                 });
 
-                $latestActiveSubscription = $activeSubscriptions[0];
+                $latestActiveSubscription = $sortedActiveSubscriptions->first();
                 $hasActiveSubscription = true;
             }
         }

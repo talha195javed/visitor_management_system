@@ -14,7 +14,7 @@
                         <div class="billing-toggle-container bg-white rounded-pill p-1 d-inline-block shadow-sm">
                             <div class="form-check form-switch d-flex align-items-center justify-content-between m-0">
                                 <span class="px-3 fw-medium {{ !request()->has('annual') ? 'text-primary' : 'text-muted' }}">Monthly</span>
-                                <input class="form-check-input mx-0" type="checkbox" id="billingToggle" {{ request()->has('annual') ? 'checked' : '' }}>
+                                <input style="margin-left: -78px !important;" class="form-check-input mx-0" type="checkbox" id="billingToggle" {{ request()->has('annual') ? 'checked' : '' }}>
                                 <label class="form-check-label px-3 fw-medium {{ request()->has('annual') ? 'text-primary' : 'text-muted' }}" for="billingToggle">
                                     Annual <span class="badge bg-success ms-1">Save 10%</span>
                                 </label>
@@ -154,25 +154,46 @@
     <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-gradient-primary text-white">
-                    <h5 class="modal-title">Subscribe to <span id="packageTitle"></span> Plan</h5>
+                <!-- Modal Header -->
+                <div class="modal-header bg-gradient-primary text-white py-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-credit-card fa-lg me-3"></i>
+                        <div>
+                            <h5 class="modal-title mb-0">Complete Payment</h5>
+                            <p class="small mb-0 opacity-75">Secure checkout powered by Stripe</p>
+                        </div>
+                    </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="paymentForm">
-                    <div class="modal-body">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <!-- Modal Body -->
+                <div class="modal-body p-4">
+                    <!-- Payment Summary -->
+                    <div class="payment-summary bg-light rounded-3 p-4 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
-                                <h3 class="mb-0">AED <span id="packagePrice" class="fw-bold"></span>/<span id="packagePeriod" class="text-muted">month</span></h3>
-                                <small class="text-muted">Billed <span id="billingFrequency">monthly</span></small>
+                                <h6 class="mb-1 fw-bold">Order Summary</h6>
+                                <span class="text-muted small" id="billingFrequency">Monthly billing</span>
                             </div>
-                            <div id="paymentProcessing" class="d-none">
-                                <div class="spinner-grow spinner-grow-sm text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <span class="ms-2">Processing...</span>
+                            <div class="text-end">
+                                <h4 class="mb-0 fw-bold">AED <span id="packagePrice">0.00</span></h4>
+                                <span class="text-muted small">per <span id="packagePeriod">month</span></span>
                             </div>
                         </div>
+                        <div class="border-top pt-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal</span>
+                                <span>AED <span id="subtotalAmount">0.00</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Tax</span>
+                                <span>AED 0.00</span>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Payment Form -->
+                    <form id="paymentForm">
                         <input type="hidden" name="package_type" id="packageType">
                         <input type="hidden" name="duration" id="packageDuration">
                         <input type="hidden" name="amount" id="packageAmount">
@@ -181,89 +202,175 @@
                         <input type="hidden" name="existing_subscription_id" value="{{ $latestActiveSubscription->id ?? '' }}">
                         <input type="hidden" name="existing_subscription_end_date" value="{{ $latestActiveSubscription->end_date ?? '' }}">
 
+                        <!-- Billing Information -->
+                        <h6 class="fw-bold mb-3 text-uppercase small">Billing Information</h6>
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="name" name="name" placeholder="Full Name" value="{{ auth()->user()->name }}" required>
-                                    <label for="name">Full Name On Card</label>
+                                    <label for="name">Full Name</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{ auth()->user()->email }}" readonly required>
-                                    <label for="email">Email Confirmation</label>
+                                    <label for="email">Email Address</label>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-12">
                                 <div class="form-floating">
                                     <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone" value="{{ auth()->user()->phone }}" required>
                                     <label for="phone">Phone Number</label>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="h-100 d-flex align-items-center">
-                                    @if($hasActiveSubscription)
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="package_date" id="startNow" value="now">
-                                        <label class="form-check-label" for="startNow">Start Now</label>
+                            @if($hasActiveSubscription)
+                            <div class="col-12">
+                                <div class="d-flex align-items-center justify-content-between bg-light p-3 rounded">
+                                    <span class="fw-medium">Subscription Start Date:</span>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="package_date" id="startNow" value="now">
+                                            <label class="form-check-label" for="startNow">Immediately</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="package_date" id="startOnExpiry" value="expiry" checked>
+                                            <label class="form-check-label" for="startOnExpiry">
+                                                After {{ \Carbon\Carbon::parse($latestActiveSubscription->end_date)->format('M d, Y') }}
+                                            </label>
+                                        </div>
                                     </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="package_date" id="startOnExpiry" value="expiry" checked>
-                                        <label class="form-check-label" for="startOnExpiry">
-                                            After {{ \Carbon\Carbon::parse($latestActiveSubscription->end_date)->format('M d') }}
-                                        </label>
-                                    </div>
-                                    @else
-                                    <div class="text-muted">Subscription starts immediately</div>
-                                    @endif
                                 </div>
                             </div>
+                            @endif
                         </div>
 
+                        <!-- Card Details -->
+                        <h6 class="fw-bold mb-3 text-uppercase small">Payment Method</h6>
                         <div class="mb-4">
-                            <label class="form-label mb-2">Card Details</label>
                             <div id="cardElement" class="form-control p-3 border rounded"></div>
                             <div id="cardErrors" class="text-danger mt-2 small"></div>
                         </div>
 
+                        <!-- Security Badge -->
+                        <div class="d-flex align-items-center justify-content-center bg-light p-2 rounded mb-4">
+                            <div class="me-2">
+                                <i class="fas fa-lock fa-lg text-primary"></i>
+                            </div>
+                            <div class="text-center">
+                                <small class="text-muted">All transactions are secured with 256-bit SSL encryption</small>
+                            </div>
+                            <div class="ms-2">
+                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/stripe/stripe-original.svg" width="40" alt="Stripe">
+                            </div>
+                        </div>
+
+                        <!-- Payment Status Messages -->
                         <div id="paymentSuccess" class="alert alert-success d-none">
                             <div class="d-flex align-items-center">
-                                <i class="fas fa-check-circle fa-2x me-3"></i>
+                                <i class="fas fa-check-circle fa-lg me-3"></i>
                                 <div>
-                                    <h5 class="alert-heading mb-1">Payment Successful!</h5>
-                                    <p class="mb-0">Your subscription has been activated. Redirecting...</p>
+                                    <h6 class="alert-heading mb-1">Payment Successful!</h6>
+                                    <p class="mb-0">Your subscription is now active.</p>
                                 </div>
                             </div>
                         </div>
 
                         <div id="paymentError" class="alert alert-danger d-none">
                             <div class="d-flex align-items-center">
-                                <i class="fas fa-exclamation-circle fa-2x me-3"></i>
+                                <i class="fas fa-exclamation-circle fa-lg me-3"></i>
                                 <div id="paymentErrorMessage"></div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer border-top-0 bg-light">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" id="submitBtn" class="btn btn-gradient-primary px-4">
-                            <span class="payment-button-text">Pay AED <span id="submitAmount"></span></span>
-                            <span class="payment-button-loader d-none">
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            Processing...
-                        </span>
-                        </button>
-                    </div>
-                </form>
+
+                        <!-- Form Actions -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" id="submitBtn" class="btn btn-primary btn-lg py-3">
+                            <span class="payment-button-text">
+                                <i class="fas fa-lock me-2"></i>Pay AED <span id="submitAmount">0.00</span>
+                            </span>
+                                <span class="payment-button-loader d-none">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                Processing Payment...
+                            </span>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                Cancel Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
+    @push('styles')
+    <style>
+        /* Payment Form Styling */
+        #paymentModal .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #paymentModal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-bottom: none;
+        }
+
+        .payment-summary {
+            border-left: 4px solid #667eea;
+            background-color: #f8f9fa;
+        }
+
+        #cardElement {
+            min-height: 50px;
+            padding: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        #cardElement:hover, #cardElement--focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .payment-button-text, .payment-button-loader {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #5a6fd1, #68448f);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        @media (max-width: 576px) {
+            #paymentModal .modal-dialog {
+                margin: 0.5rem;
+            }
+
+            #paymentModal .modal-body {
+                padding: 1.5rem;
+            }
+
+            .payment-summary {
+                padding: 1rem;
+            }
+        }
+    </style>
+    @endpush
 </main>
 @endsection
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/admin_package_index.css') }}">
 @endpush
-
 @push('scripts')
 <script src="https://js.stripe.com/v3/"></script>
 <script>
@@ -301,7 +408,8 @@
                     base: {
                         fontSize: '16px',
                         color: '#32325d',
-                        fontFamily: '"Inter", sans-serif',
+                        fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                        fontSmoothing: 'antialiased',
                         '::placeholder': {
                             color: '#aab7c4'
                         }

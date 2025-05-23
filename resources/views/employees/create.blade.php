@@ -34,31 +34,46 @@
                                 <form id="employeeForm">
                                     @csrf
 
-                                    <!-- Step 1: Full Name -->
                                     <label for="name" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
                                     <div id="nameField" class="form-group d-flex align-items-center msideb-3">
                                         <input type="text" class="form-control" name="name" id="name" placeholder="Full Name">
                                     </div>
 
-                                    <!-- Step 2: Company -->
                                     <label for="company" class="col-md-4 col-lg-3 col-form-label">Company</label>
                                     <div id="companyField" class="form-group d-flex align-items-center mb-3">
                                         <input type="text" class="form-control" name="company" id="company" placeholder="Office in which you are working">
                                     </div>
 
-                                    <!-- Step 3: Email -->
+                                    <label for="client_id" class="col-md-4 col-lg-3 col-form-label">Client</label>
+                                    <div class="form-group d-flex align-items-center mb-3">
+                                        <select class="form-control" name="client_id" id="client_id" required>
+                                            <option value="">Select a Client</option>
+                                            @foreach($clients as $client)
+                                            <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
                                     <label for="email" class="col-md-4 col-lg-3 col-form-label">Email</label>
                                     <div id="emailField" class="form-group d-flex align-items-center mb-3">
                                         <input type="email" class="form-control" name="email" id="email" placeholder="Email">
                                     </div>
 
-                                    <!-- Step 4: Phone -->
                                     <label for="contact_number" class="col-md-4 col-lg-3 col-form-label">Contact Number</label>
                                     <div id="phoneField" class="form-group d-flex align-items-center mb-3">
                                         <input type="text" class="form-control" name="contact_number" id="contact_number" placeholder="Contact Number">
                                     </div>
-
-                                    <!-- Step 6: ID Number -->
+                                    @if(auth()->user() && (auth()->user()->role == 'superAdmin'))
+                                    <label for="client_id" class="col-md-4 col-lg-3 col-form-label">Client</label>
+                                    <div class="form-group d-flex align-items-center mb-3">
+                                        <select class="form-control" name="client_id" id="client_id" required>
+                                            <option value="">Select a Client</option>
+                                            @foreach($clients as $client)
+                                            <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @endif
                                     <label for="position" class="col-md-4 col-lg-3 col-form-label">Position</label>
                                     <div id="idNumberField" class="form-group d-flex align-items-center mb-3">
                                         <input type="text" class="form-control" name="position" id="position" placeholder="Enter Your Company Position">

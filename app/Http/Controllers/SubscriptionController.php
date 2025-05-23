@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CustomerSubscription;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Stripe\Stripe;
 
 class SubscriptionController extends Controller
@@ -79,26 +80,56 @@ class SubscriptionController extends Controller
 
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
-            'package_type' => 'required|string|max:255',
             'amount' => 'required|numeric',
-            'status' => 'required|in:active,pending,cancelled,expired',
+            'status' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
         ]);
 
-        $subscription->update($validated);
+        $existingStatus = $subscription->status;
+        $existingEndDate = Carbon::parse($subscription->end_date);
+        $newStatus = $validated['status'];
+        $newEndDate = Carbon::parse($validated['end_date']);
+        $today = Carbon::today();
 
-        return redirect()->route('subscriptions.index')
-            ->with('success', 'Subscription updated successfully');
+        if ($newStatus === 'cancelled' && $existingStatus !== 'cancelled') {
+            $validated['end_date'] = $today;
+        }
+
+        elseif ($newStatus === 'offer_time' && $newEndDate->isFuture() && $existingEndDate->isPast()) {
+
+            $validated['status'] = 'offer time';
+            $validated['end_date'] = $newEndDate;
+        }
+
+        $subscription->update([
+            'status' => $validated['status'],
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+        ]);
+
+        if(Auth::user()->role == 'superAdmin') {
+            return redirect()->route('admin.subscriptions.index')
+                ->with('success', 'Subscription updated successfully');
+        }
     }
+
 
     public function destroy($id)
     {
         $subscription = CustomerSubscription::findOrFail($id);
-        $subscription->delete();
 
-        return redirect()->route('subscriptions.index')
-            ->with('success', 'Subscription cancelled successfully');
+        if ($subscription->end_date > now()) {
+            $subscription->end_date = now();
+        }
+
+        $subscription->status = 'expired';
+        $subscription->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Subscription expired successfully'
+        ]);
     }
 
     public function saveCustomerDetails(Request $request)

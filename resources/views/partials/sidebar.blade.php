@@ -194,12 +194,14 @@
                         <span>All Subscriptions</span>
                     </a>
                 </li>
+                @if(auth()->user() && (auth()->user()->role == 'client'))
                 <li class="submenu-item">
                     <a href="{{ route('admin.subscriptions.index') }}">
                         <i class="bi bi-record-circle"></i>
                         <span>Packages List</span>
                     </a>
                 </li>
+                @endif
             </ul>
         </li>
         @endif

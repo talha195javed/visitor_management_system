@@ -62,13 +62,21 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
+                            @if(Auth::user()->role == 'superAdmin')
                             <a href="/subscriptions/index" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left me-1"></i> Back to List
                             </a>
+                            @elseif(Auth::user()->role == 'client')
+                            <a href="/client_subscriptions/index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Back to My Subscriptions
+                            </a>
+                            @endif
                             <div>
+                                @if(Auth::user()->role == 'superAdmin')
                                 <a href="{{ route('admin.subscriptions.edit', $subscription->id) }}" class="btn btn-primary me-2">
                                     <i class="fas fa-edit me-1"></i> Edit
                                 </a>
+                                @endif
                                 <form action="{{ route('admin.subscriptions.destroy', $subscription->id) }}" method="POST" style="display: inline;">
                                     @csrf
                                     @method('DELETE')

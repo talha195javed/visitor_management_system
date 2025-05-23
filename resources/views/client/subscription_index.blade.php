@@ -70,7 +70,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h6 class="text-uppercase text-muted mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">TOTAL REVENUE</h6>
+                                <h6 class="text-uppercase text-muted mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">TOTAL EXPENSE</h6>
                                 <h2 class="mb-0" style="color: #36b9cc; font-weight: 700;">${{ number_format($stats['revenue'], 2) }}</h2>
                             </div>
                             <div class="icon-circle" style="background-color: rgba(54, 185, 204, 0.1); color: #36b9cc;">
