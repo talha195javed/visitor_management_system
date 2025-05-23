@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\AdminSuccessMail;
+use App\Models\Client;
 use App\Models\CompanyInfo;
 use App\Models\Employee;
 use App\Models\FieldSetting;
@@ -90,10 +91,15 @@ class VisitorController extends Controller
         $visitor->country_code = $request->country_code;
         $visitor->id_type = $request->id_type;
         $visitor->identification_number = $request->identification_number;
-        $visitor->client_id = $request->client_id;
+//        $visitor->client_id = $request->client_id;
         $visitor->pre_register = 1;
-        $visitor->client_id = $userId;
-
+        if (auth()->user()->role == 'superAdmin')
+        {
+            $visitor->client_id = $request->client_id;
+        }
+        else {
+            $visitor->client_id = $userId;
+        }
         $visitor->save();
 
         return response()->json(['success' => true]);
@@ -679,7 +685,9 @@ class VisitorController extends Controller
      */
     public function admin_preRegister()
     {
-        return view('visitor.admin_pre_register');
+        $clients = Client::all();
+
+        return view('visitor.admin_pre_register', compact('clients'));
     }
 
     /**

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomerSubscription;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Stripe\Stripe;
 
 class SubscriptionController extends Controller
 {
@@ -24,7 +27,6 @@ class SubscriptionController extends Controller
     public function client_index()
     {
         $currentUser = auth()->user();
-
         $userType = $currentUser->role;
 
         $query = CustomerSubscription::query()->orderBy('id', 'desc');
@@ -34,6 +36,15 @@ class SubscriptionController extends Controller
         }
 
         $subscriptions = $query->get();
+
+        // Split subscriptions into active and expired
+        $activeSubscriptions = $subscriptions->filter(function ($subscription) {
+            return \Carbon\Carbon::parse($subscription->end_date)->isFuture();
+        });
+
+        $expiredSubscriptions = $subscriptions->filter(function ($subscription) {
+            return \Carbon\Carbon::parse($subscription->end_date)->isPast();
+        });
 
         $baseQuery = CustomerSubscription::query();
         if ($userType === 'client') {
@@ -47,9 +58,9 @@ class SubscriptionController extends Controller
             'recent' => (clone $baseQuery)->where('created_at', '>=', now()->subDays(30))->count(),
         ];
 
-
-        return view('subscriptions.index', compact('subscriptions', 'stats'));
+        return view('subscriptions.client_index', compact('activeSubscriptions', 'expiredSubscriptions', 'stats'));
     }
+
 
     public function show($id)
     {
@@ -69,26 +80,56 @@ class SubscriptionController extends Controller
 
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
-            'package_type' => 'required|string|max:255',
             'amount' => 'required|numeric',
-            'status' => 'required|in:active,pending,cancelled,expired',
+            'status' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
         ]);
 
-        $subscription->update($validated);
+        $existingStatus = $subscription->status;
+        $existingEndDate = Carbon::parse($subscription->end_date);
+        $newStatus = $validated['status'];
+        $newEndDate = Carbon::parse($validated['end_date']);
+        $today = Carbon::today();
 
-        return redirect()->route('subscriptions.index')
-            ->with('success', 'Subscription updated successfully');
+        if ($newStatus === 'cancelled' && $existingStatus !== 'cancelled') {
+            $validated['end_date'] = $today;
+        }
+
+        elseif ($newStatus === 'offer_time' && $newEndDate->isFuture() && $existingEndDate->isPast()) {
+
+            $validated['status'] = 'offer time';
+            $validated['end_date'] = $newEndDate;
+        }
+
+        $subscription->update([
+            'status' => $validated['status'],
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+        ]);
+
+        if(Auth::user()->role == 'superAdmin') {
+            return redirect()->route('admin.subscriptions.index')
+                ->with('success', 'Subscription updated successfully');
+        }
     }
+
 
     public function destroy($id)
     {
         $subscription = CustomerSubscription::findOrFail($id);
-        $subscription->delete();
 
-        return redirect()->route('subscriptions.index')
-            ->with('success', 'Subscription cancelled successfully');
+        if ($subscription->end_date > now()) {
+            $subscription->end_date = now();
+        }
+
+        $subscription->status = 'expired';
+        $subscription->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Subscription expired successfully'
+        ]);
     }
 
     public function saveCustomerDetails(Request $request)
@@ -152,6 +193,108 @@ class SubscriptionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error occurred: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function renewSubscription(Request $request)
+    {
+        \Log::debug('Raw input:', $request->all());
+        $validated = $request->validate([
+            'subscription_id' => 'required|exists:customer_subscriptions,id',
+            'billing_cycle' => 'required|in:monthly,yearly',
+            'payment_method_id' => 'required|string',
+            'amount' => 'required|numeric',
+            'auto_renew' => 'sometimes|boolean',
+            'is_new_card' => 'sometimes|boolean'
+        ]);
+
+        try {
+            Stripe::setApiKey(env('STRIPE_SECRET'));
+
+            $subscription = CustomerSubscription::find($validated['subscription_id']);
+            $amount = $validated['amount'] * 100; // Convert to cents
+
+            // Create payment intent
+            $paymentIntent = \Stripe\PaymentIntent::create([
+                'amount' => $amount,
+                'currency' => $subscription->currency,
+                'customer' => $subscription->stripe_customer_id,
+                'payment_method' => $validated['payment_method_id'],
+                'off_session' => true,
+                'confirm' => !$validated['is_new_card'],
+                'metadata' => [
+                    'subscription_id' => $subscription->id,
+                    'renewal' => true
+                ]
+            ]);
+
+            if (!$validated['is_new_card'] && $paymentIntent->status === 'succeeded') {
+                return $this->createRenewal($subscription, $validated, $paymentIntent->id);
+            }
+
+            return response()->json([
+                'client_secret' => $paymentIntent->client_secret,
+                'requires_action' => $paymentIntent->status === 'requires_action'
+            ]);
+
+        } catch (\Stripe\Exception\CardException $e) {
+            Log::error('Stripe Card Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 400);
+        } catch (\Exception $e) {
+            Log::error('Renewal Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'An error occurred. Please try again.'
+            ], 500);
+        }
+    }
+
+    private function createRenewal($oldSubscription, $data, $paymentIntentId)
+    {
+        try {
+            $startDate = Carbon::parse($oldSubscription->end_date)->addSecond();
+            $endDate = $data['billing_cycle'] === 'yearly'
+                ? $startDate->copy()->addYear()
+                : $startDate->copy()->addMonth();
+
+            $newSubscription = CustomerSubscription::create([
+                'customer_name' => $oldSubscription->customer_name,
+                'customer_email' => $oldSubscription->customer_email,
+                'customer_phone' => $oldSubscription->customer_phone,
+                'client_id' => $oldSubscription->client_id,
+                'package_type' => $oldSubscription->package_type,
+                'billing_cycle' => $data['billing_cycle'],
+                'payment_intent_id' => $paymentIntentId,
+                'stripe_customer_id' => $oldSubscription->stripe_customer_id,
+                'payment_method_id' => $data['payment_method_id'],
+                'amount' => $data['amount'],
+                'currency' => $oldSubscription->currency,
+                'status' => 'active',
+                'ip_address' => request()->ip(),
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ]);
+
+            $oldSubscription->update([
+                'status' => 'renewed',
+                'renewed_by' => $newSubscription->id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Subscription renewed successfully',
+                'data' => $newSubscription
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Create Renewal Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to create renewal: ' . $e->getMessage()
             ], 500);
         }
     }

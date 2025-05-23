@@ -125,6 +125,16 @@
                                     </div>
                                 </div>
                             </div>
+                            @if(auth()->user() && (auth()->user()->role == 'superAdmin'))
+                            <div class="form-group d-flex align-items-center mb-3">
+                                <select class="form-control" name="client_id" id="client_id" required>
+                                    <option value="">Select a Client</option>
+                                    @foreach($clients as $client)
+                                    <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @endif
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                                 <button type="button" class="btn btn-outline-secondary me-md-2">

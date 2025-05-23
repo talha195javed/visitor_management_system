@@ -13,7 +13,7 @@
                 <li class="breadcrumb-item active">Profile</li>
             </ol>
         </nav>
-    </div><!-- End Page Title -->
+    </div>
 
     <section class="section profile">
         <div class="row">

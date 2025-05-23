@@ -1,0 +1,140 @@
+
+.subscription-hero {
+    background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 10px 30px rgba(58, 123, 213, 0.2);
+}
+
+.billing-toggle-container .form-check-input {
+    width: 3rem;
+    height: 1.75rem;
+}
+
+.pricing-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.pricing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.popular-plan {
+    border: 2px solid #3a7bd5;
+    box-shadow: 0 5px 20px rgba(58, 123, 213, 0.3);
+}
+
+.popular-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: rotate(45deg) translate(25%, -50%);
+    width: 180px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.feature-list li {
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.feature-list li:last-child {
+    border-bottom: none;
+}
+
+.btn-gradient-primary {
+    background: linear-gradient(to right, #3a7bd5, #00d2ff);
+    color: white;
+    border: none;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.btn-gradient-primary:hover {
+    background: linear-gradient(to right, #2c65c4, #00c2f0);
+    color: white;
+}
+
+.price-display {
+    padding: 20px;
+    background: rgba(58, 123, 213, 0.05);
+    border-radius: 10px;
+}
+
+.price-savings {
+    font-size: 0.85rem;
+}
+
+@media (max-width: 767.98px) {
+    .subscription-hero {
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    .billing-toggle-container {
+        margin-top: 1rem;
+        width: 100%;
+    }
+
+    #paymentModal .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    #paymentModal .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-bottom: none;
+    }
+
+    .payment-summary {
+        border-left: 4px solid #667eea;
+        background-color: #f8f9fa;
+    }
+
+    #cardElement {
+        min-height: 50px;
+        padding: 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    #cardElement:hover, #cardElement--focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+
+    .payment-button-text, .payment-button-loader {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-primary {
+        background: linear-gradient(to right, #667eea, #764ba2);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(to right, #5a6fd1, #68448f);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    @media (max-width: 576px) {
+        #paymentModal .modal-dialog {
+            margin: 0.5rem;
+        }
+
+        #paymentModal .modal-body {
+            padding: 1.5rem;
+        }
+
+        .payment-summary {
+            padding: 1rem;
+        }
+    }
+}

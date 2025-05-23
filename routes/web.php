@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientLoginController;
 use App\Http\Controllers\CompanyInfoController;
 use App\Http\Controllers\SubscriptionController;
+use App\Models\CustomerSubscription;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
@@ -11,6 +13,7 @@ use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FieldSettingController;
+use Stripe\Stripe;
 
 // Landing Page
 // Rename the visitor home route
@@ -136,6 +139,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/user_show/{id}', [AdminController::class, 'user_show'])->name('users.user_show');
 
     Route::post('/user_store', [AdminController::class, 'store'])->name('users.store');
+
 });
 Route::post('/update-user', [AdminController::class, 'update_user'])->name('users.update_user');
 
@@ -170,3 +174,17 @@ Route::post('/client/logout', [ClientLoginController::class, 'logout'])->name('c
 
 
 Route::get('/client/visitors/{client}', [ClientController::class, 'getClientVisitors'])->name('client.visitors');
+
+
+ Route::get('/', [PackageController::class, 'index'])->name('admin.packages.index');
+ Route::get('/admin/renew-packages/{id}', [PackageController::class, 'renew_index'])->name('admin.renew_packages.index');
+    Route::post('/create-payment-intent', [PackageController::class, 'createPaymentIntent'])->name('admin.packages.create-payment-intent');
+    Route::post('/save-details', [PackageController::class, 'saveCustomerDetails'])->name('admin.packages.save-details');
+
+
+Route::post('/subscriptions/renew', function(Request $request) {
+
+});
+
+Route::post('/subscriptions/renew', [SubscriptionController::class, 'renewSubscription'])
+    ->name('subscriptions.renew');

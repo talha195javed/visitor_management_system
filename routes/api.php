@@ -92,17 +92,41 @@ Route::post('/create-payment-intent', function (Request $request) {
     \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
     try {
+        // Check if customer already exists
+        $customer = null;
+        if (auth()->check()) {
+            $existingSubscription = CustomerSubscription::where('client_id', auth()->id())->first();
+
+            if ($existingSubscription && $existingSubscription->stripe_customer_id) {
+                $customer = $existingSubscription->stripe_customer_id;
+            } else {
+                // Create new customer if doesn't exist
+                $stripeCustomer = \Stripe\Customer::create([
+                    'email' => auth()->user()->email,
+                    'name' => auth()->user()->name,
+                    'metadata' => [
+                        'user_id' => auth()->id(),
+                        'app_customer' => true
+                    ]
+                ]);
+                $customer = $stripeCustomer->id;
+            }
+        }
+
         $paymentIntent = \Stripe\PaymentIntent::create([
             'amount' => $request->amount,
             'currency' => $request->currency ?? 'aed',
+            'customer' => $customer,
+            'setup_future_usage' => 'off_session', // Important for recurring payments
             'metadata' => [
                 'plan' => $request->plan,
-                'user_id' => auth()->id() ?? 'guest' // If you have authentication
+                'user_id' => auth()->id() ?? 'guest'
             ],
         ]);
 
         return response()->json([
-            'clientSecret' => $paymentIntent->client_secret
+            'clientSecret' => $paymentIntent->client_secret,
+            'stripe_customer_id' => $customer
         ]);
     } catch (\Exception $e) {
         return response()->json([
@@ -122,9 +146,33 @@ Route::post('/save-customer-details', function(Request $request) {
         'payment_intent_id' => 'required|string',
         'amount' => 'required|numeric',
         'currency' => 'required|string|size:3',
+        'stripe_customer_id' => 'sometimes|string', // Add validation
     ]);
 
     try {
+        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        // Retrieve payment intent to get payment method
+        $paymentIntent = \Stripe\PaymentIntent::retrieve($validated['payment_intent_id']);
+        $paymentMethodId = $paymentIntent->payment_method;
+
+        // Attach payment method to customer if not already attached
+        if (!empty($validated['stripe_customer_id']) && $paymentMethodId) {
+            $paymentMethod = \Stripe\PaymentMethod::retrieve($paymentMethodId);
+
+            if (!$paymentMethod->customer) {
+                $paymentMethod->attach([
+                    'customer' => $validated['stripe_customer_id']
+                ]);
+
+                // Set as default payment method
+                \Stripe\Customer::update(
+                    $validated['stripe_customer_id'],
+                    ['invoice_settings' => ['default_payment_method' => $paymentMethodId]]
+                );
+            }
+        }
+
         $startDate = now(); // default
 
         // If startOnExpiry is true
@@ -132,7 +180,6 @@ Route::post('/save-customer-details', function(Request $request) {
             $existingEndDate = Carbon::parse($request->existing_subscription_end_date);
             $startDate = $existingEndDate->copy()->addSecond();
 
-            // If startNow is true and existing subscription exists, end that one now
         } elseif ($request->startNow) {
             $startDate = now();
 
@@ -159,6 +206,8 @@ Route::post('/save-customer-details', function(Request $request) {
             'package_type' => $validated['package_type'],
             'billing_cycle' => $validated['duration'],
             'payment_intent_id' => $validated['payment_intent_id'],
+            'stripe_customer_id' => $validated['stripe_customer_id'] ?? null,
+            'payment_method_id' => $paymentMethodId ?? null,
             'amount' => $validated['amount'],
             'currency' => $validated['currency'],
             'status' => 'active',

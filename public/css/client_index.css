@@ -1,0 +1,127 @@
+
+.subscription-management {
+    background: #f8f9fa;
+}
+
+.stat-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(255,255,255,0.4);
+}
+
+.card-header-gradient {
+    background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.card-header-secondary {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.table-actions .btn {
+    padding: 0.375rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+}
+
+.subscription-btn {
+    background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(58, 123, 213, 0.3);
+}
+
+.subscription-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(58, 123, 213, 0.4);
+    color: white;
+}
+
+.badge-expiring {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-active {
+    background-color: #28a745;
+}
+
+.badge-expired {
+    background-color: #dc3545;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(58, 123, 213, 0.05);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.status-active {
+    background-color: #28a745;
+}
+
+.status-expired {
+    background-color: #dc3545;
+}
+
+.status-expiring {
+    background-color: #ffc107;
+}
+
+.pagetitle {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #3a7bd5;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #2c65c4;
+}
