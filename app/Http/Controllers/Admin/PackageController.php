@@ -11,12 +11,21 @@ use Stripe\PaymentMethod;
 
 class PackageController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
         $packages = $this->getPackageData();
         $client = auth()->user();
 
-        // Get active subscriptions
+        if (!$client) {
+            redirect('/client/login'); // or redirect to login
+        }
+
+
         $subscriptions = CustomerSubscription::where('client_id', $client->id)->get();
         $hasActiveSubscription = false;
         $latestActiveSubscription = null;
