@@ -7,6 +7,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Stripe\Stripe;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class SubscriptionController extends Controller
 {
@@ -78,13 +80,29 @@ class SubscriptionController extends Controller
     {
         $subscription = CustomerSubscription::findOrFail($id);
 
-        $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'amount' => 'required|numeric',
-            'status' => 'required|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-        ]);
+        $data = [
+            'customer_name' => $request->has('customer_name') ? $request->input('customer_name') : $subscription->customer_name,
+            'amount'        => $request->has('amount') ? $request->input('amount') : $subscription->amount,
+            'status'        => $request->has('status') ? $request->input('status') : $subscription->status,
+            'auto_renew'    => $request->has('auto_renew') ? (bool)$request->input('auto_renew') : $subscription->auto_renew,
+            'start_date'    => $request->has('start_date') ? $request->input('start_date') : $subscription->start_date,
+            'end_date'      => $request->has('end_date') ? $request->input('end_date') : $subscription->end_date,
+        ];
+
+        try {
+            $validated = Validator::make($data, [
+                'customer_name' => 'required|string|max:255',
+                'amount' => 'required|numeric',
+                'status' => 'required|string',
+                'auto_renew' => 'required|boolean',
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after:start_date',
+            ])->validate();
+        } catch (ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        }
 
         $existingStatus = $subscription->status;
         $existingEndDate = Carbon::parse($subscription->end_date);
@@ -94,24 +112,21 @@ class SubscriptionController extends Controller
 
         if ($newStatus === 'cancelled' && $existingStatus !== 'cancelled') {
             $validated['end_date'] = $today;
-        }
-
-        elseif ($newStatus === 'offer_time' && $newEndDate->isFuture() && $existingEndDate->isPast()) {
-
+        } elseif ($newStatus === 'offer_time' && $newEndDate->isFuture() && $existingEndDate->isPast()) {
             $validated['status'] = 'offer time';
             $validated['end_date'] = $newEndDate;
         }
 
-        $subscription->update([
-            'status' => $validated['status'],
-            'start_date' => $validated['start_date'],
-            'end_date' => $validated['end_date'],
-        ]);
+        $subscription->status = $validated['status'];
+        $subscription->start_date = $validated['start_date'];
+        $subscription->end_date = $validated['end_date'];
+        $subscription->auto_renew = $validated['auto_renew'];
+        $subscription->save();
 
-        if(Auth::user()->role == 'superAdmin') {
-            return redirect()->route('admin.subscriptions.index')
-                ->with('success', 'Subscription updated successfully');
-        }
+        $route = Auth::user()->role == 'superAdmin' ? 'admin.subscriptions.index' : 'admin.client_subscriptions.index';
+
+        return redirect()->route($route)
+            ->with('success', 'Subscription updated successfully');
     }
 
 
@@ -134,15 +149,12 @@ class SubscriptionController extends Controller
 
     public function saveCustomerDetails(Request $request)
     {
-        // Log incoming request data
         Log::info('Incoming Request:', $request->all());
 
-        // Listen to DB queries for debugging
         DB::listen(function ($query) {
             Log::info('SQL Query: ' . $query->sql, $query->bindings);
         });
 
-        // Validate request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -165,6 +177,7 @@ class SubscriptionController extends Controller
                 'package_type' => $validated['package_type'],
                 'billing_cycle' => $validated['duration'],
                 'payment_intent_id' => $validated['payment_intent_id'],
+                'payment_method_id' => $validated['payment_method_id'],
                 'amount' => $validated['amount'],
                 'currency' => $validated['currency'],
                 'status' => 'active',

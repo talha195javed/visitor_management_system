@@ -34,18 +34,14 @@ class PackageController extends Controller
         $package = Package::findOrFail($request->package_id);
         $user = auth()->user();
 
-        // Check if user has active subscription
         $hasActiveSubscription = $user->subscriptions()->where('end_date', '>', now())->exists();
 
-        // Validate start option
         if ($request->start_option === 'expiry' && !$hasActiveSubscription) {
             return back()->with('error', 'You need an active subscription to start on expiry');
         }
 
-        // Calculate price
         $price = $request->billing_period === 'year' ? $package->yearly_price : $package->monthly_price;
 
-        // Create Stripe payment intent
         Stripe::setApiKey(config('services.stripe.secret'));
 
         try {
@@ -125,7 +121,6 @@ class PackageController extends Controller
             return response()->json(['error' => 'Package not found'], 404);
         }
 
-        // Create payment record
         $payment = Payment::create([
             'user_id' => $user->id,
             'stripe_payment_intent_id' => $request->payment_intent_id,
@@ -135,11 +130,9 @@ class PackageController extends Controller
             'payment_details' => $request->except(['_token'])
         ]);
 
-        // Determine subscription dates
         $startDate = now();
         $endDate = $request->duration === 'yearly' ? now()->addYear() : now()->addMonth();
 
-        // If starting on expiry of current subscription
         if ($request->package_date === 'expiry') {
             $currentSubscription = $user->subscriptions()
                 ->where('end_date', '>', now())
@@ -154,7 +147,6 @@ class PackageController extends Controller
             }
         }
 
-        // Create subscription
         $subscription = Subscription::create([
             'user_id' => $user->id,
             'package_id' => $package->id,
@@ -164,7 +156,6 @@ class PackageController extends Controller
             'is_active' => true
         ]);
 
-        // Update payment with subscription ID
         $payment->update(['subscription_id' => $subscription->id]);
 
         return response()->json(['success' => true]);
@@ -195,17 +186,14 @@ class PackageController extends Controller
         switch ($event->type) {
             case 'payment_intent.succeeded':
                 $paymentIntent = $event->data->object;
-                // Handle payment success
                 break;
 
             case 'invoice.payment_succeeded':
                 $invoice = $event->data->object;
-                // Handle recurring payment success
                 break;
 
             case 'invoice.payment_failed':
                 $invoice = $event->data->object;
-                // Handle payment failure
                 break;
         }
 

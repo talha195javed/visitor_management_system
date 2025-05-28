@@ -14,6 +14,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FieldSettingController;
 use Stripe\Stripe;
+use App\Http\Controllers\StripeWebhookController;
 
 // Landing Page
 // Rename the visitor home route
@@ -188,3 +189,7 @@ Route::post('/subscriptions/renew', function(Request $request) {
 
 Route::post('/subscriptions/renew', [SubscriptionController::class, 'renewSubscription'])
     ->name('subscriptions.renew');
+
+Route::post('/subscription/renew-last', [PackageController::class, 'renewUsingLastSubscriptionPrice']);
+
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);

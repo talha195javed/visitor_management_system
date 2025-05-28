@@ -468,5 +468,17 @@
         }
     });
 </script>
+@if(session('no_subscription'))
+<script>
+    Swal.fire({
+        icon: 'warning',
+        title: 'No Active Subscription',
+        html: `You do not have any active subscription. Please contact Admin or buy a New Package from <a href="https://smartvisitor.io/home" target="_blank" style="color:#3085d6; text-decoration:underline;">Main Page</a>.`,
+        confirmButtonText: 'OK',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+    });
+</script>
+@endif
 </body>
 </html>
