@@ -10,7 +10,7 @@
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
-        "stripe/stripe-php": "*",
+        "stripe/stripe-php": "^17.2",
         "thiagoalessio/tesseract_ocr": "^2.13",
         "webpatser/laravel-countries": "^1.5"
     },

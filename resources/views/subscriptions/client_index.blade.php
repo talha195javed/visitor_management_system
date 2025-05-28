@@ -290,7 +290,27 @@
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap5.min.js"></script>
 <script src="{{ asset('js/subscriptions.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+@if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: "{{ session('success') }}",
+        showConfirmButton: true,
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'OK',
+        position: 'center',
+        showClass: {
+            popup: 'swal2-show swal2-animate-popup'
+        },
+        hideClass: {
+            popup: 'swal2-hide swal2-animate-popup'
+        }
+    });
+</script>
+@endif
 @endpush
 
 @endsection

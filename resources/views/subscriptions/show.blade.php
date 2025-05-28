@@ -33,8 +33,8 @@
                                 <p><strong>Status:</strong>
                                     <span class="badge
                                         @if($subscription->status == 'active') bg-success
-                                        @elseif($subscription->status == 'pending') bg-warning
-                                        @elseif($subscription->status == 'cancelled') bg-secondary
+                                        @elseif($subscription->status == 'renewed') bg-secondary
+                                        @elseif($subscription->status == 'cancelled') bg-warning
                                         @elseif($subscription->status == 'expired') bg-danger
                                         @endif">
                                         {{ ucfirst($subscription->status) }}
@@ -72,11 +72,10 @@
                             </a>
                             @endif
                             <div>
-                                @if(Auth::user()->role == 'superAdmin')
+                                @if( !(Auth::user()->role == 'client' && in_array($subscription->status, ['renewed', 'expired', 'cancelled'])) )
                                 <a href="{{ route('admin.subscriptions.edit', $subscription->id) }}" class="btn btn-primary me-2">
                                     <i class="fas fa-edit me-1"></i> Edit
                                 </a>
-                                @endif
                                 <form action="{{ route('admin.subscriptions.destroy', $subscription->id) }}" method="POST" style="display: inline;">
                                     @csrf
                                     @method('DELETE')
@@ -84,6 +83,7 @@
                                         <i class="fas fa-ban me-1"></i> Cancel
                                     </button>
                                 </form>
+                                @endif
                             </div>
                         </div>
                     </div>

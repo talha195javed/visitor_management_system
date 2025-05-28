@@ -92,45 +92,37 @@ Route::post('/create-payment-intent', function (Request $request) {
     \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
     try {
-        // Check if customer already exists
-        $customer = null;
-        if (auth()->check()) {
-            $existingSubscription = CustomerSubscription::where('client_id', auth()->id())->first();
+        // Make payment_method_id optional for initial creation
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'payment_method_id' => 'sometimes|string|starts_with:pm_',
+            'email' => 'required|email',
+            'name' => 'required|string|max:255',
+            'client_id' => 'required|integer',
+            'currency' => 'sometimes|string|size:3',
+            'plan' => 'sometimes|string'
+        ]);
 
-            if ($existingSubscription && $existingSubscription->stripe_customer_id) {
-                $customer = $existingSubscription->stripe_customer_id;
-            } else {
-                // Create new customer if doesn't exist
-                $stripeCustomer = \Stripe\Customer::create([
-                    'email' => auth()->user()->email,
-                    'name' => auth()->user()->name,
-                    'metadata' => [
-                        'user_id' => auth()->id(),
-                        'app_customer' => true
-                    ]
-                ]);
-                $customer = $stripeCustomer->id;
-            }
-        }
-
+        // Create PaymentIntent without payment method initially
         $paymentIntent = \Stripe\PaymentIntent::create([
-            'amount' => $request->amount,
-            'currency' => $request->currency ?? 'aed',
-            'customer' => $customer,
-            'setup_future_usage' => 'off_session', // Important for recurring payments
+            'amount' => $validated['amount'],
+            'currency' => $validated['currency'] ?? 'aed',
             'metadata' => [
-                'plan' => $request->plan,
-                'user_id' => auth()->id() ?? 'guest'
+                'plan' => $validated['plan'] ?? 'unknown',
+                'client_id' => $validated['client_id']
             ],
         ]);
 
         return response()->json([
+            'success' => true,
             'clientSecret' => $paymentIntent->client_secret,
-            'stripe_customer_id' => $customer
+            'payment_intent_id' => $paymentIntent->id
         ]);
+
     } catch (\Exception $e) {
         return response()->json([
-            'error' => $e->getMessage()
+            'success' => false,
+            'error' => env('APP_DEBUG') ? $e->getMessage() : 'Payment processing failed'
         ], 500);
     }
 });
@@ -140,64 +132,42 @@ Route::post('/save-customer-details', function(Request $request) {
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'phone' => 'required|string|max:20',
-        'client_id' => 'required|max:20',
-        'package_type' => 'required|string|in:basic,professional,enterprise',
-        'duration' => 'required|string|in:monthly,yearly',
+        'client_id' => 'required|integer',
+        'package_type' => 'required|in:basic,professional,enterprise',
+        'duration' => 'required|in:monthly,yearly',
         'payment_intent_id' => 'required|string',
-        'amount' => 'required|numeric',
-        'currency' => 'required|string|size:3',
-        'stripe_customer_id' => 'sometimes|string', // Add validation
+        'payment_method_id' => 'required|string',
+        'amount' => 'required|numeric|min:0.5',
+        'currency' => 'required|string|size:3'
     ]);
 
     try {
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
-        // Retrieve payment intent to get payment method
-        $paymentIntent = \Stripe\PaymentIntent::retrieve($validated['payment_intent_id']);
-        $paymentMethodId = $paymentIntent->payment_method;
+        // Create or retrieve customer
+        $customer = \Stripe\Customer::create([
+            'email' => $validated['email'],
+            'name' => $validated['name'],
+            'phone' => $validated['phone'],
+            'metadata' => ['client_id' => $validated['client_id']]
+        ]);
 
-        // Attach payment method to customer if not already attached
-        if (!empty($validated['stripe_customer_id']) && $paymentMethodId) {
-            $paymentMethod = \Stripe\PaymentMethod::retrieve($paymentMethodId);
+        // Attach payment method
+        $paymentMethod = \Stripe\PaymentMethod::retrieve($validated['payment_method_id']);
+        $paymentMethod->attach(['customer' => $customer->id]);
 
-            if (!$paymentMethod->customer) {
-                $paymentMethod->attach([
-                    'customer' => $validated['stripe_customer_id']
-                ]);
+        // Update customer with default payment method
+        \Stripe\Customer::update($customer->id, [
+            'invoice_settings' => ['default_payment_method' => $paymentMethod->id]
+        ]);
 
-                // Set as default payment method
-                \Stripe\Customer::update(
-                    $validated['stripe_customer_id'],
-                    ['invoice_settings' => ['default_payment_method' => $paymentMethodId]]
-                );
-            }
-        }
-
-        $startDate = now(); // default
-
-        // If startOnExpiry is true
-        if ($request->startOnExpiry && $request->existing_subscription_end_date) {
-            $existingEndDate = Carbon::parse($request->existing_subscription_end_date);
-            $startDate = $existingEndDate->copy()->addSecond();
-
-        } elseif ($request->startNow) {
-            $startDate = now();
-
-            if (!empty($request->existing_subscription_id)) {
-                $existingSub = CustomerSubscription::find($request->existing_subscription_id);
-                if ($existingSub) {
-                    $existingSub->end_date = now();
-                    $existingSub->save();
-                }
-            }
-        }
-
-        // Calculate end date based on new start date
+        // Date calculations
+        $startDate = now();
         $endDate = $validated['duration'] === 'yearly'
             ? $startDate->copy()->addYear()
             : $startDate->copy()->addMonth();
 
-        // Create the new subscription
+        // Create subscription
         $subscription = CustomerSubscription::create([
             'customer_name' => $validated['name'],
             'customer_email' => $validated['email'],
@@ -206,11 +176,12 @@ Route::post('/save-customer-details', function(Request $request) {
             'package_type' => $validated['package_type'],
             'billing_cycle' => $validated['duration'],
             'payment_intent_id' => $validated['payment_intent_id'],
-            'stripe_customer_id' => $validated['stripe_customer_id'] ?? null,
-            'payment_method_id' => $paymentMethodId ?? null,
+            'stripe_customer_id' => $customer->id,
+            'payment_method_id' => $validated['payment_method_id'],
             'amount' => $validated['amount'],
             'currency' => $validated['currency'],
             'status' => 'active',
+            'auto_renew' => true,
             'ip_address' => $request->ip(),
             'start_date' => $startDate,
             'end_date' => $endDate,
@@ -218,18 +189,13 @@ Route::post('/save-customer-details', function(Request $request) {
 
         return response()->json([
             'success' => true,
-            'message' => 'Customer details and subscription saved successfully',
             'data' => $subscription
         ]);
 
     } catch (\Exception $e) {
-        \Log::error('Failed to save customer details: ' . $e->getMessage());
-        \Log::error($e->getTraceAsString());
-
         return response()->json([
             'success' => false,
-            'message' => 'Failed to save customer details. Please try again.',
-            'error' => env('APP_DEBUG') ? $e->getMessage() : null
+            'error' => env('APP_DEBUG') ? $e->getMessage() : 'Failed to save subscription'
         ], 500);
     }
 });

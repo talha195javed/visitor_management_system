@@ -523,6 +523,7 @@
                                 return obj;
                             }, {}),
                             payment_intent_id: paymentIntent.id,
+                            payment_method_id: paymentIntent.payment_method,
                             startNow: form.find('#startNow').is(':checked') ? 1 : 0,
                             startOnExpiry: form.find('#startOnExpiry').is(':checked') ? 1 : 0
                         },

@@ -25,6 +25,7 @@ class CustomerSubscription extends Model
         'ip_address',
         'start_date',
         'end_date',
+        'auto_renew',
     ];
 
     protected $casts = [

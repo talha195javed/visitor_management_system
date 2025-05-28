@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\CustomerSubscription;
 
 class LoginController extends Controller
 {
@@ -20,12 +21,22 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
-        // Store user type in session
-        $userType = $request->input('user_type');
-        session(['user_type' => $userType]);
+        if ($user->role === 'client') {
+            $hasActiveSubscription = CustomerSubscription::where('client_id', $user->id)
+                ->where('status', 'active')
+                ->where('end_date', '>', now())
+                ->exists();
 
-        // Both types will be redirected to /home
-        // You'll handle the differences in your views/controllers
+            if (!$hasActiveSubscription) {
+                Auth::logout();
+
+                return redirect('/login')->with([
+                    'no_subscription' => true,
+                    'message' => 'You do not have any active subscription. Please contact Admin or buy a New Package from Main Page.'
+                ]);
+            }
+        }
+
         return redirect()->intended($this->redirectPath());
     }
 
@@ -48,3 +59,4 @@ class LoginController extends Controller
         return redirect('/login');
     }
 }
+

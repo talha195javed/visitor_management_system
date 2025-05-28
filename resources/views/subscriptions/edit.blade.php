@@ -84,7 +84,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
-                                            <select class="form-select" id="status" name="status" required>
+                                            <select class="form-select" id="status" name="status" required @if(Auth::user()->role == 'client') disabled @endif>
                                                 <option value="active" {{ $subscription->status == 'active' ? 'selected' : '' }}>Active</option>
                                                 <option value="pending" {{ $subscription->status == 'offer_time' ? 'selected' : '' }}>Bonous Time</option>
                                                 <option value="cancelled" {{ $subscription->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
@@ -104,20 +104,34 @@
                                     <div class="col-md-6">
                                         <div class="form-floating">
                                             <input type="date" class="form-control" id="start_date" name="start_date"
-                                                   value="{{ old('start_date', $subscription->start_date->format('Y-m-d')) }}" required>
+                                                   value="{{ old('start_date', $subscription->start_date->format('Y-m-d')) }}" required
+                                                   @if(Auth::user()->role == 'client') disabled @endif>
                                             <label for="start_date">Start Date</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating">
                                             <input type="date" class="form-control" id="end_date" name="end_date"
-                                                   value="{{ old('end_date', $subscription->end_date->format('Y-m-d')) }}" required>
+                                                   value="{{ old('end_date', $subscription->end_date->format('Y-m-d')) }}" required
+                                                   @if(Auth::user()->role == 'client') disabled @endif>
                                             <label for="end_date">End Date</label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-sync-alt me-2"></i>Auto Subscription
+                                </h4>
+                                <div class="form-check form-switch ml-3">
+                                    <input type="hidden" name="auto_renew" value="0">
 
+                                    <input class="form-check-input" type="checkbox" id="auto_renew" name="auto_renew" value="1"
+                                           {{ old('auto_renew', $subscription->auto_renew) ? 'checked' : '' }}
+                                    @if(Auth::user()->role == 'client') @endif>
+                                    <label class="form-check-label" for="auto_renew">Auto Subscription</label>
+                                </div>
+                            </div>
                             <div class="form-actions">
                                 <a href="{{ route('admin.subscriptions.index') }}" class="btn btn-outline-secondary">
                                     <i class="fas fa-arrow-left me-2"></i> Back to List
