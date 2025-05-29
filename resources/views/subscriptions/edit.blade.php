@@ -121,15 +121,24 @@
                             </div>
                             <div class="form-section">
                                 <h4 class="section-title">
-                                    <i class="fas fa-sync-alt me-2"></i>Auto Subscription
+                                    <i class="fas fa-sync-alt me-2"></i>Subscription Management
                                 </h4>
-                                <div class="form-check form-switch ml-3">
-                                    <input type="hidden" name="auto_renew" value="0">
+                                <div class="d-flex justify-content-between align-items-center">
 
-                                    <input class="form-check-input" type="checkbox" id="auto_renew" name="auto_renew" value="1"
-                                           {{ old('auto_renew', $subscription->auto_renew) ? 'checked' : '' }}
-                                    @if(Auth::user()->role == 'client') @endif>
-                                    <label class="form-check-label" for="auto_renew">Auto Subscription</label>
+                                    @if(Auth::user()->role == 'superAdmin')
+                                    <div class="form-check form-switch">
+                                        <input type="hidden" name="auto_renew" value="0">
+                                        <input class="form-check-input" type="checkbox" id="auto_renew" name="auto_renew" value="1"
+                                               {{ old('auto_renew', $subscription->auto_renew) ? 'checked' : '' }}
+                                        <label class="form-check-label" for="auto_renew">Auto Renewal</label>
+                                    </div>
+
+                                    @elseif(Auth::user()->role == 'client')
+
+                                    <button type="button" class="btn btn-cancel-subscription" data-bs-toggle="modal" data-bs-target="#cancelSubscriptionModal">
+                                        <i class="fas fa-ban me-2"></i> Cancel Subscription
+                                    </button>
+                                    @endif
                                 </div>
                             </div>
                             <div class="form-actions">
@@ -147,6 +156,60 @@
         </div>
     </div>
 </main>
+
+<!-- Cancel Subscription Modal -->
+<div class="modal fade" id="cancelSubscriptionModal" tabindex="-1" aria-labelledby="cancelSubscriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelSubscriptionModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Cancel Subscription Request
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div class="cancel-icon">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <h4 class="mt-3">Need to cancel your subscription?</h4>
+                    <p class="text-muted">To cancel your subscription, please contact our support team directly. We're here to help!</p>
+                </div>
+
+                <div class="contact-options">
+                    <div class="contact-option email-option">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h5>Email Support</h5>
+                            <p>Send us an email with your cancellation request</p>
+                            <a href="mailto:support@smartvisitor.com?subject=Subscription Cancellation Request" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-paper-plane me-2"></i> Email Us
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-option whatsapp-option mt-3">
+                        <div class="contact-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h5>WhatsApp Support</h5>
+                            <p>Chat with us directly on WhatsApp</p>
+                            <a href="https://wa.me/971504406565?text=I%20would%20like%20to%20cancel%20my%20subscription" class="btn btn-outline-success w-100">
+                                <i class="fab fa-whatsapp me-2"></i> Chat on WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('styles')
@@ -281,6 +344,84 @@
         letter-spacing: 0.5px;
     }
 
+    /* Cancel Subscription Button Styles */
+    .btn-cancel-subscription {
+        background: linear-gradient(135deg, #f72585, #b5179e);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 10px rgba(247, 37, 133, 0.3);
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-cancel-subscription:hover {
+        background: linear-gradient(135deg, #b5179e, #f72585);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(247, 37, 133, 0.4);
+        color: white;
+    }
+
+    /* Modal Styles */
+    .cancel-icon {
+        font-size: 4rem;
+        color: #f72585;
+        margin-bottom: 1rem;
+    }
+
+    .contact-options {
+        margin-top: 2rem;
+    }
+
+    .contact-option {
+        display: flex;
+        align-items: flex-start;
+        padding: 1rem;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+
+    .contact-icon {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        padding: 0.75rem;
+        border-radius: 50%;
+        background-color: white;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .email-option .contact-icon {
+        color: #4361ee;
+        border: 1px solid #4361ee;
+    }
+
+    .whatsapp-option .contact-icon {
+        color: #25D366;
+        border: 1px solid #25D366;
+    }
+
+    .contact-details {
+        flex: 1;
+    }
+
+    .contact-details h5 {
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+    }
+
+    .contact-details p {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.75rem;
+    }
+
     @media (max-width: 768px) {
         .form-actions {
             flex-direction: column;
@@ -290,6 +431,26 @@
         .form-actions .btn {
             width: 100%;
         }
+
+        .contact-option {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .contact-icon {
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    // You can add any additional JavaScript here if needed
+    document.addEventListener('DOMContentLoaded', function() {
+        // Any initialization code can go here
+    });
+</script>
 @endpush
