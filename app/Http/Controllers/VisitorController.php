@@ -821,6 +821,7 @@ class VisitorController extends Controller
             'company' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
+            'client_id' => 'nullable|string|max:20',
             'id_type' => 'nullable|string|max:50',
             'identification_number' => 'nullable|string|max:50',
         ]);
@@ -946,6 +947,41 @@ class VisitorController extends Controller
                 'message' => 'Photo uploaded successfully!',
                 'visitor_id' => $request->visitor_id,
                 'photo_url' => asset($imagePath), // Return full URL for frontend use
+                'visibleFields' => $visibleFields
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No photo uploaded.'
+        ], 400);
+    }
+
+    public function storeAppIdCapturedImage(Request $request)
+    {
+
+        $visitor = Visitor::findOrFail($request->visitor_id);
+
+        if ($request->hasFile('photo')) {
+            $imageFile = $request->file('photo');
+
+            $imageName = 'visitor_' . $request->visitor_id . '_' . time() . '.' . $imageFile->getClientOriginalExtension();
+
+            $imagePath = 'assets/visitor_photos/' . $imageName;
+
+            $imageFile->move(public_path('assets/visitor_photos'), $imageName);
+
+            $visitor->scan_id_photo = $imageName;
+            $visitor->save();
+
+            // Get visible screen fields
+            $visibleFields = ScreenSetting::where('is_visible', true)->pluck('screen_name')->toArray();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Photo uploaded successfully!',
+                'visitor_id' => $request->visitor_id,
+                'photo_url' => asset($imagePath),
                 'visibleFields' => $visibleFields
             ]);
         }

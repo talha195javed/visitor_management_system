@@ -28,6 +28,8 @@ Route::post('/visitor/setAppPurpose', [VisitorController::class, 'setAppPurpose'
 
 Route::post('/visitor/storeAppCapturedImage', [VisitorController::class, 'storeAppCapturedImage']);
 
+Route::post('/visitor/storeAppIdCapturedImage', [VisitorController::class, 'storeAppIdCapturedImage']);
+
 Route::post('/visitor/storeAppCapturedIDImage', [VisitorController::class, 'storeAppCapturedIDImage']);
 
 Route::post('/visitor/appEmergencyContact', [VisitorController::class, 'appEmergencyContact']);
